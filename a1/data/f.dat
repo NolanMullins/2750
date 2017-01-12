@@ -1,11 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct f
-{
-    int aa;};
+class A {
+	int a;
+	int fn(){
+		return 0;
+	}
+}
+
+class B {
+	int b;
+	int fn()
+	{
+		return 0;
+	}
+}
 
 int main()
 {
-    printf("hello\n");
+	return 0;
 }

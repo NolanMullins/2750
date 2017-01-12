@@ -1,45 +1,39 @@
 #include <stdio.h>
+#include <list.h>
+#include <util.h>
+#include <string.h>
 
 int main()
 {
-	FILE* f = fopen("data/f.dat", "r");
-	char tmp = getc(f);
-	int flag = 0;
-	while (tmp != EOF)
+	List* myList = init();
+	myList = convertToList("data/f.dat", myList);
+	int size = listSize(myList);
+
+	for (int a = 0; a < size; a++)
 	{
-		if (tmp == '\t' || tmp == ' ' || tmp == '\n' || tmp == '\r')
+		if (strcmp("class",((Data*)listGet(myList, a))->line)==0)
 		{
-			if (flag!=1)
+			int start=0,end=0;
+			int depth = 0;
+			for (int b = a; b < size; b++)
 			{
-				printf("\n");
-				flag = 1;
+				if (strcmp("{",((Data*)listGet(myList, b))->line)==0)
+					if (depth++==0)
+						start = b+1;
+				if (strcmp("}",((Data*)listGet(myList, b))->line)==0)
+					if (--depth==0)
+					{
+						end = b-1;
+						break;
+					}
 			}
+			parseClass(myList, start, end, ((Data*)listGet(myList, a+1))->line);
 		}
-		else if (tmp == ';' || tmp == '(' || tmp == ')' || tmp == '{' || tmp == '}')
-		{
-			if (flag == 0)
-				printf("\n");
-			printf("%c\n", tmp);
-			flag = 1;
-		}
-		else if (tmp == '"')
-		{
-			char last = tmp;
-			while (tmp != '"' && last != '\\')
-			{
-				last = tmp;
-				printf("%c", tmp);
-				tmp = getc(f);
-			}
-			printf("%c", tmp);
-		}
-		else
-		{
-			flag = 0;
-			//printf("%d\n", tmp);
-			printf("%c", tmp);
-		}
-		tmp = getc(f);
 	}
-	fclose(f);
+
+	//replaceInList(myList, "class", "struct");
+	for (int a = 0; a < size; a++)
+	{
+		//printf("%s\n", ((Data*)listGet(myList, a))->line);
+	}
 }

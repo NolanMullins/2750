@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+class A {
+	int a;
+	int fn(){
+		return 0;
+	}
+}
+
+class B {
+	int b;
+	int fn()
+	{
+		return 0;
+	}
+}
+
+int main()
+{
+	return 0;
+}
+
+/********************************************/
+
+#include
+<stdio.h>
+#include
+<stdlib.h>
+struct
+A
+{
+int
+a
+;
+int
+fn
+(
+)
+{
+return
+0
+;
+}
+}
+struct
+B
+{
+int
+b
+;
+int
+fn
+(
+)
+{
+return
+0
+;
+}
+}
+int
+main
+(
+)
+{
+return
+0
+;
+}
