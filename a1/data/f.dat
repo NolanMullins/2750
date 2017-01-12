@@ -1,0 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct f
+{
+    int aa;};
+
+int main()
+{
+    printf("hello\n");
+}
