@@ -13,6 +13,15 @@ Data* createLine(char* data)
 	return d;
 }
 
+Data* createLineSafe(char* data)
+{
+	Data* d = malloc(sizeof(Data));
+	char* ptr = malloc(sizeof(char)*strlen(data)+1);
+	strcpy(ptr, data);
+	d->line = ptr;
+	return d;
+}
+
 char* append(char* line, char c)
 {
 	int len = strlen(line);
@@ -114,6 +123,7 @@ void parseFile(List* lines)
 				if (strcmp("(",d->line)==0 && depth==1)
 				{
 					Data* last = (Data*)listGet(lines,a-1);
+					Data* type = (Data*)listGet(lines,a-2);
 					char* oldName = last->line;
 					char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(name)+1));
 					strcpy(newName, name);
@@ -128,6 +138,17 @@ void parseFile(List* lines)
 							a++;
 						}
 					}
+					char fncPtrString[256];
+					strcpy(fncPtrString, "(*");
+					strcat(fncPtrString, newName);
+					strcat(fncPtrString, ")()")
+					Data* ptrType = createLineSafe(type->line);
+					Data* ptrName = createLineSafe(fncPtrString);
+					Data* semi = createLineSafe(";");
+					listInsert(lines, ptrType, firstFnc++);
+					listInsert(lines, ptrName, firstFnc++);
+					listInsert(lines, semi, firstFnc++);
+					a+=3;
 					last->line = newName;
 				}
 
@@ -141,7 +162,6 @@ void parseFile(List* lines)
 			Data* node = (Data*)listRemove(lines, a);
 			listInsert(lines, node,firstFnc);
 		}
-		/**/
 	}
 }
 
@@ -165,7 +185,10 @@ void outputCode(List* lines)
 	for (int a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
-		printf("%s ", d->line);
+		if (a < size-1 && strcmp(";",((Data*)listGet(lines,a+1))->line)==0)
+			printf("%s", d->line);
+		else
+			printf("%s ", d->line);
 		if (strcmp("}",d->line)==0)
 			printNewLine(--depth, lines, a);
 		if (strcmp("{",d->line)==0)
