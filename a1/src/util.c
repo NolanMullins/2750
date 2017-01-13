@@ -160,20 +160,27 @@ void parseFile(List* lines)
 			}
 			tagged = 0;
 			Data* node = (Data*)listRemove(lines, a);
+			Data* semi = createLineSafe(";");
 			listInsert(lines, node,firstFnc);
+			listInsert(lines, semi,firstFnc+1);
+			a++;
 		}
 	}
 }
 
 void printNewLine(int depth, List* lines, int index)
 {
-	printf("\n");
+	
 	int size = listSize(lines);
 	char c = ' ';
 	if (index+1 < size)
 		c = ((Data*)listGet(lines,index+1))->line[0];
 	if (c=='}')
 		depth--;
+	if (c==';')
+		if (((Data*)listGet(lines,index))->line[0]=='}')
+			return;
+	printf("\n");
 	for (int a = 0; a < depth*4; a++)
 				printf("%c", ' ');
 }
