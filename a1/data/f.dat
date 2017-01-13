@@ -10,7 +10,7 @@ class A {
 
 class B {
 	int b;
-	int fn()
+	int fn(int a, char b)
 	{
 		return 0;
 	}

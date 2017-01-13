@@ -84,16 +84,95 @@ void replaceInList(List* list, char* remove, char* place)
 	}
 }
 
-Class* parseClass(List* lines, int start, int end, char* class)
+void parseFile(List* lines)
 {
-	for (int a = start; a <= end; a++)
+	int size = listSize(lines);
+	int depth = 0;
+	int firstFnc = 0;
+	int tagged = 0;
+	for (int a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
-		if (strcmp("(", d->line)==0)
+		//parse function here
+		if (strcmp("class",d->line)==0)
 		{
-			printf("%s%s\n", class,((Data*)listGet(lines,a-1))->line);
-		}
-	}
+			free(d->line);
+			char* tmp = malloc(sizeof(char)*7);
+			strcpy(tmp, "struct");
+			d->line = tmp;
+			char * name = ((Data*)listGet(lines,a+1))->line;
+			while (depth != 0 || strcmp("}",d->line)!=0)
+			{
+				d = (Data*)listGet(lines,++a);
+				//locate first function
+				if (strcmp("(",d->line)==0 && depth==1 && tagged==0)
+				{
+					firstFnc = a-2;
+					tagged = 1;
+				}
+				//edit function names
+				if (strcmp("(",d->line)==0 && depth==1)
+				{
+					Data* last = (Data*)listGet(lines,a-1);
+					char* oldName = last->line;
+					char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(name)+1));
+					strcpy(newName, name);
+					strcat(newName,oldName);
+					free(oldName);
+					while (strcmp(")",d->line)!=0)
+					{
+						d = (Data*)listGet(lines,++a);
+						if (strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
+						{
+							newName = append(newName, d->line[0]);
+							a++;
+						}
+					}
+					last->line = newName;
+				}
 
-	return NULL;
+				if (strcmp("{",d->line)==0)
+					depth++;
+					
+				if (strcmp("}",d->line)==0)
+					depth--;
+			}
+			tagged = 0;
+			Data* node = (Data*)listRemove(lines, a);
+			listInsert(lines, node,firstFnc);
+		}
+		/**/
+	}
+}
+
+void printNewLine(int depth, List* lines, int index)
+{
+	printf("\n");
+	int size = listSize(lines);
+	char c = ' ';
+	if (index+1 < size)
+		c = ((Data*)listGet(lines,index+1))->line[0];
+	if (c=='}')
+		depth--;
+	for (int a = 0; a < depth*4; a++)
+				printf("%c", ' ');
+}
+
+void outputCode(List* lines)
+{
+	int size = listSize(lines);
+	int depth = 0;
+	for (int a = 0; a < size; a++)
+	{
+		Data* d = (Data*)listGet(lines,a);
+		printf("%s ", d->line);
+		if (strcmp("}",d->line)==0)
+			printNewLine(--depth, lines, a);
+		if (strcmp("{",d->line)==0)
+			printNewLine(++depth, lines, a);
+		if (d->line[strlen(d->line)-1]=='>')
+			printf("\n");
+		if (strcmp(";",d->line)==0)
+			printNewLine(depth, lines, a);
+	}
 }
