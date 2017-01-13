@@ -141,7 +141,7 @@ void parseFile(List* lines)
 					char fncPtrString[256];
 					strcpy(fncPtrString, "(*");
 					strcat(fncPtrString, newName);
-					strcat(fncPtrString, ")()")
+					strcat(fncPtrString, ")()");
 					Data* ptrType = createLineSafe(type->line);
 					Data* ptrName = createLineSafe(fncPtrString);
 					Data* semi = createLineSafe(";");
