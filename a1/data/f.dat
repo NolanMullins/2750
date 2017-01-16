@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//test
 class A {
 	int a;
-	int fn(){
+	int fn(){ //test
 		return 0;
 	}
 }
-
+//
 class B {
 	int b;
 	int fn(int a, char b)
@@ -16,7 +17,15 @@ class B {
 	}
 }
 
+/*this is a test
+ * 
+ */
 int main()
 {
+	printf("class a {");
+	/*for (int a = 0; a < 10; a++)//yikes
+	{
+
+	}*/
 	return 0;
 }

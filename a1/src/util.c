@@ -34,6 +34,7 @@ List* convertToList(char* file, List* list)
 {
 	FILE* f = fopen(file, "r");
 	char tmp = getc(f);
+	char last = '0';
 	int flag = 0;
 	while (tmp != EOF)
 	{
@@ -54,13 +55,37 @@ List* convertToList(char* file, List* list)
 			listAdd(list, createLine(line));
 			flag = 1;
 		}
+		//parse in strings
 		else if (tmp == '"')
 		{
 			char last = tmp;
+			append(line, tmp);
+			tmp = getc(f);
 			while (tmp != '"' && last != '\\')
 			{
 				last = tmp;
 				append(line, tmp);
+				tmp = getc(f);
+			}
+			append(line, tmp);
+			listAdd(list, createLine(line));
+			last = '0';
+		}
+		else if (tmp == '/' && last == '/')
+		{
+			while (!(tmp == '\n' || tmp == '\r'))
+			{
+				append(line,tmp);
+				last = tmp;
+				tmp = getc(f);
+			}
+		}
+		else if (tmp == '*' && last == '/')
+		{
+			while (!(tmp == '/' && last == '*'))
+			{
+				append(line,tmp);
+				last = tmp;
 				tmp = getc(f);
 			}
 			append(line, tmp);
@@ -71,6 +96,7 @@ List* convertToList(char* file, List* list)
 			//printf("%d\n", tmp);
 			append(line, tmp);
 		}
+		last = tmp;
 		tmp = getc(f);
 	}
 	fclose(f);
@@ -129,6 +155,7 @@ void parseFile(List* lines)
 					strcpy(newName, name);
 					strcat(newName,oldName);
 					free(oldName);
+					//append parameters to function name
 					while (strcmp(")",d->line)!=0)
 					{
 						d = (Data*)listGet(lines,++a);
@@ -192,6 +219,18 @@ void outputCode(List* lines)
 	for (int a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
+		if (strlen(d->line)>1 && d->line[0] == '/' && d->line[1] == '/')
+		{
+			printf("%s", d->line);
+			printNewLine(depth, lines, a);
+			continue;
+		}
+		if (strlen(d->line)>1 && d->line[0] == '/' && d->line[1] == '*')
+		{
+			printf("%s", d->line);
+			printNewLine(depth, lines, a);
+			continue;
+		}
 		if (a < size-1 && strcmp(";",((Data*)listGet(lines,a+1))->line)==0)
 			printf("%s", d->line);
 		else
