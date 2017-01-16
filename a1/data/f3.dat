@@ -7,11 +7,6 @@ class A {
 	int fn(){ //test
 		return 0;
 	}
-	int b;
-	void ryan<3()
-	{
-		
-	}
 }
 //
 class B {
