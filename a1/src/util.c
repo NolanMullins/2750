@@ -150,7 +150,6 @@ char* createFunctionName(List* lines, char* className, int* startIndex)
 	return newName;
 }
 
-//OLD
 char* createFncPtr(char* fncName)
 {
 	char* ptr = malloc(sizeof(char)*(strlen(fncName)+5+1));
@@ -158,6 +157,29 @@ char* createFncPtr(char* fncName)
 	strcat(ptr, fncName);
 	strcat(ptr, ")()");
 	return ptr;
+}
+
+List* genFncPtrs(List* functions)
+{
+	List* ptrs = init();
+	for (int a = 0; a < listSize(functions); a++)
+	{
+		List* fnc = (List*)listGet(functions,a);
+		List* fncPtr = init();
+		if (listSize(fnc) < 2)
+			continue;
+		Data* type = (Data*)listGet(fnc, 0);
+		Data* name = (Data*)listGet(fnc,1);
+		char* fncPtrString = createFncPtr(name->line);
+		listAdd(fncPtr, createLine(type->line));
+		listAdd(fncPtr, createLine(fncPtrString));
+		char tmp[2];
+		strcpy(tmp, ";");
+		listAdd(fncPtr, createLine(tmp));//createLine(";"));
+		free(fncPtrString);
+		listAdd(ptrs, fncPtr);
+	}
+	return ptrs;
 }
 
 char* getFncName(List* fnc, char* className)
@@ -312,6 +334,8 @@ void insertFunctions(List* lines, List* functions, int index)
 	while (listSize(functions)>0)
 	{
 		List* fnc = (List*)listRemove(functions, 0);
+		//printf("%s\n", ((Data*)listGet(fnc,0))->line);
+		//function type not correctly inserted into list
 		while (listSize(fnc)>0)
 		{
 			Data* line = (Data*)listRemove(fnc,0);
@@ -331,9 +355,22 @@ void parseFile(List* lines)
 		//parse function here
 		if (strcmp("class",d->line)==0)
 		{
+			free(d->line);
+			char* s = malloc(sizeof(char)*(strlen("struct")+1));
+			strcpy(s,"struct");
+			d->line = s;
 			//parseFunction(lines, &a, &depth);
 			//pull functions out of class
 			List* functions = parseFunctions(lines, a);
+			//Generate function pointers
+			List* ptrs = genFncPtrs(functions);
+			//move to end of class
+			do 
+			{
+				d = (Data*)listGet(lines,++a);
+			} while (strcmp(d->line, "}")!=0);
+			//insert function pointers into struct
+			insertFunctions(lines, ptrs, a);
 			do 
 			{
 				d = (Data*)listGet(lines,++a);
