@@ -1,36 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-//test
-class A {
-	int a;
-	int fn(){ //test
-		return 0;
-	}
-	int b;
-	void ryan<3()
-	{
-		
-	}
-}
-//
-class B {
-	int b;
-	int fn(int a, char b)
-	{
-		return 0;
-	}
-}
-
-/*this is a test
- * 
- */
-int main()
+class a
 {
-	printf("class a {");
-	/*for (int a = 0; a < 10; a++)//yikes
+	yolo
+	int fn()
 	{
 
-	}*/
-	return 0;
+	}
 }
+//tmp

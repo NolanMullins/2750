@@ -7,11 +7,15 @@ class A {
 	int fn(){ //test
 		return 0;
 	}
+	void ryan<3()
+	{
+		
+	}
 }
 //
 class B {
 	int b;
-	int fn(int a, char b)
+	int fnB(int a, char b)
 	{
 		return 0;
 	}
