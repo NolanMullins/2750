@@ -1,6 +1,6 @@
 class a
 {
-	yolo
+	yolo;
 	int fn()
 	{
 

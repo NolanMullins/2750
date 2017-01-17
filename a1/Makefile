@@ -1,5 +1,5 @@
 OBJQ1 = main.o list.o util.o
-FLAGS = -std=c99 -Iinclude -g
+FLAGS =-Wall -std=c99 -Iinclude -g
 EXE = run
 
 

@@ -185,15 +185,13 @@ char* getFncName(List* fnc, char* className)
 
 List* removeFnc(List* lines, int startIndex)
 {
-	List* fnc = init();
 	int depth = 0;
 	Data* d = (Data*)listGet(lines,startIndex);
+	List* newList = init();
 	//printf("CALL: %s\n", d->line);
 	while (depth != 1 || strcmp("}",d->line)!=0)
 	{
 		//printf("%s\n", ((Data*)listRemove(lines, startIndex))->line);
-		Data* old = (Data*)listRemove(lines, startIndex);
-		
 		//printf("%s\n", tmp->line);
 		//
 		//listAdd(fnc, (Data*)listRemove(lines, startIndex));
@@ -203,21 +201,25 @@ List* removeFnc(List* lines, int startIndex)
 			
 		if (strcmp("}",d->line)==0)
 			depth--;
+		Data* old = (Data*)listRemove(lines, startIndex);
+		Data* tmp = createLine(old->line);
+		listInsert(newList, tmp, 0);
+		delLine(old);
+
 		//delLine(old);
 		//printf("test2\n");
-		printf("Test\n");
-		Data* tmp = createLine(old->line);
-		listAdd(fnc, tmp);
+		//Data* tmp = createLine(old->line);
 		d = (Data*)listGet(lines,startIndex);
 		//printf("Line: %s depth:%d\n", d->line, depth);
-		printf("Test2\n");
 	}
 	//listAdd(fnc, (Data*)listRemove(lines, startIndex));
 	Data* old = (Data*)listRemove(lines, startIndex);
-	//Data* tmp = createLine(old->line);
-	/*delLine(old);
-	listAdd(fnc, tmp);*/
-	return fnc;
+	Data* tmp = createLine(old->line);
+	listInsert(newList, tmp, 0);
+	delLine(old);
+	//listAdd(fnc, tmp);
+	//return fnc;
+	return newList;
 }
 
 void parseFunctions(List* lines, int a)
@@ -229,10 +231,9 @@ void parseFunctions(List* lines, int a)
 	{
 		if (strcmp("(",d->line)==0 && depth==1)
 		{
-			removeFnc(lines, a-2);
-			//for (int a = 0; a < listSize(fnc); a++)
-				//printf("%s\n", ((Data*)listGet(fnc,a))->line);
-			//printf("%s\n", getFncName(fnc, className));
+			List* myList = removeFnc(lines, a-2);
+			for (int a = 0; a < listSize(myList); a++)
+				printf("%s\n", ((Data*)listGet(myList, a))->line);
 			a-=3;
 		}
 		d = (Data*)listGet(lines,++a);
