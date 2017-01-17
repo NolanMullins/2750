@@ -171,8 +171,12 @@ List* genFncPtrs(List* functions)
 		Data* type = (Data*)listGet(fnc, 0);
 		Data* name = (Data*)listGet(fnc,1);
 		char* fncPtrString = createFncPtr(name->line);
-		listAdd(fncPtr, createLine(type->line));
+		//had to strcpy the string out else it got deleted for some reason
+		char stringType[strlen(type->line)+1];
+		strcpy(stringType, type->line);
+		listAdd(fncPtr, createLine(stringType));
 		listAdd(fncPtr, createLine(fncPtrString));
+		//doing it direct seg faulted
 		char tmp[2];
 		strcpy(tmp, ";");
 		listAdd(fncPtr, createLine(tmp));//createLine(";"));
@@ -257,7 +261,6 @@ List* parseFunctions(List* lines, int a)
 			//Pull the function out
 			List* myList = removeFnc(lines, a-2);
 			char* fncName = getFncName(myList, className);
-
 			Data* nameNode = (Data*)listGet(myList, 1);
 			free(nameNode->line);
 			nameNode->line = fncName;
@@ -371,11 +374,15 @@ void parseFile(List* lines)
 			} while (strcmp(d->line, "}")!=0);
 			//insert function pointers into struct
 			insertFunctions(lines, ptrs, a);
+			//move to the new end of the class
 			do 
 			{
 				d = (Data*)listGet(lines,++a);
 			} while (strcmp(d->line, "}")!=0);
+			//insert the functions
 			insertFunctions(lines, functions, a+1);
+			//calculate offset before passing functions in, move to location after funtions
+			//generate constructer there
 		}
 	}
 }
