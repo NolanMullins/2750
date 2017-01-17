@@ -19,6 +19,7 @@ Node* createNode(void* data)
 {
 	Node* newNode = malloc(sizeof(Node));
 	newNode->data = data;
+	newNode->next = NULL;
 	return newNode;
 }
 //can be optimized once code is checked
@@ -45,6 +46,7 @@ Node* get(List* head, int index)
 List* init()
 {
 	List* newHead = malloc(sizeof(List));
+	newHead->list = NULL;
 	return newHead;
 }
 

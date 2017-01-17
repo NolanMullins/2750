@@ -202,9 +202,12 @@ List* removeFnc(List* lines, int startIndex)
 		if (strcmp("}",d->line)==0)
 			depth--;
 		Data* old = (Data*)listRemove(lines, startIndex);
-		Data* tmp = createLine(old->line);
-		listInsert(newList, tmp, 0);
+		Data* newLine = createLine(old->line);
+		listAdd(newList, newLine);
 		delLine(old);
+
+
+		
 
 		//delLine(old);
 		//printf("test2\n");
@@ -215,9 +218,8 @@ List* removeFnc(List* lines, int startIndex)
 	//listAdd(fnc, (Data*)listRemove(lines, startIndex));
 	Data* old = (Data*)listRemove(lines, startIndex);
 	Data* tmp = createLine(old->line);
-	listInsert(newList, tmp, 0);
+	listAdd(newList, tmp);
 	delLine(old);
-	//listAdd(fnc, tmp);
 	//return fnc;
 	return newList;
 }
@@ -233,7 +235,7 @@ void parseFunctions(List* lines, int a)
 		{
 			List* myList = removeFnc(lines, a-2);
 			for (int a = 0; a < listSize(myList); a++)
-				printf("%s\n", ((Data*)listGet(myList, a))->line);
+				printf("%s\n", ((Data*)listGet(myList,a))->line);
 			a-=3;
 		}
 		d = (Data*)listGet(lines,++a);

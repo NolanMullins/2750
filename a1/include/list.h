@@ -36,6 +36,7 @@ void sort2(List* head, int (*cmp)(void* a, void* b));
 
 //del
 //Node* get(List* head, int index);
+Node* createNode(void* data);
 
 
 #endif
