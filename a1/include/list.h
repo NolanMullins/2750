@@ -30,6 +30,7 @@ void listInsert(List* head, void* data, int index);
 int listSize(List* head);
 void* listRemove(List* head, int index);
 List* listClear(List* head, void (*des)(void* a));
+void delHead(List* head);
 
 void sort(List* head, int (*cmp)(void* a, void* b));
 void sort2(List* head, int (*cmp)(void* a, void* b));

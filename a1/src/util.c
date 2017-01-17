@@ -163,16 +163,17 @@ char* createFncPtr(char* fncName)
 char* getFncName(List* fnc, char* className)
 {
 	int a = 1;
-	Data* d = (Data*)listGet(fnc, a);
+	//printf("%d\n", listSize(fnc));
+	Data* d = (Data*)listGet(fnc, a++);
 	char* oldName = d->line;
 	char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(className)+1));
 	strcpy(newName, className);
-	strcat(newName,oldName);
+	strcat(newName, oldName);
 	//free(oldName);
 	//append parameters to function name
+	d = (Data*)listGet(fnc,a);
 	while (strcmp(")",d->line)!=0)
 	{
-		printf("%s\n", d->line);
 		d = (Data*)listGet(fnc,++a);
 		if (strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
 		{
@@ -206,9 +207,6 @@ List* removeFnc(List* lines, int startIndex)
 		listAdd(newList, newLine);
 		delLine(old);
 
-
-		
-
 		//delLine(old);
 		//printf("test2\n");
 		//Data* tmp = createLine(old->line);
@@ -224,18 +222,26 @@ List* removeFnc(List* lines, int startIndex)
 	return newList;
 }
 
-void parseFunctions(List* lines, int a)
+List* parseFunctions(List* lines, int a)
 {
+	List* functions = init();
 	int depth = 0;
-	//char* className = ((Data*)listGet(lines,a+1))->line;
+	char* className = ((Data*)listGet(lines,a+1))->line;
 	Data* d = (Data*)listGet(lines,a);
 	while (depth != 0 || strcmp("}",d->line)!=0)
 	{
 		if (strcmp("(",d->line)==0 && depth==1)
 		{
+			//Pull the function out
 			List* myList = removeFnc(lines, a-2);
-			for (int a = 0; a < listSize(myList); a++)
-				printf("%s\n", ((Data*)listGet(myList,a))->line);
+			char* fncName = getFncName(myList, className);
+
+			Data* nameNode = (Data*)listGet(myList, 1);
+			free(nameNode->line);
+			nameNode->line = fncName;
+			listAdd(functions, myList);
+			//for (int a = 0; a < listSize(myList); a++)
+				//printf("%s\n", ((Data*)listGet(myList,a))->line);
 			a-=3;
 		}
 		d = (Data*)listGet(lines,++a);
@@ -244,6 +250,7 @@ void parseFunctions(List* lines, int a)
 		if (strcmp("}",d->line)==0)
 			depth--;
 	}
+	return functions;
 }
 
 //OLD
@@ -290,6 +297,7 @@ void parseFunction(List* lines, int* startIndex, int* depth)
 		if (strcmp("}",d->line)==0)
 			(*depth)--;
 	}
+
 	tagged = 0;
 	Data* node = (Data*)listRemove(lines, a);
 	Data* semi = createLineSafe(";");
@@ -297,6 +305,20 @@ void parseFunction(List* lines, int* startIndex, int* depth)
 	listInsert(lines, semi,firstFnc+1);
 	a++;
 	*startIndex = a;
+}
+
+void insertFunctions(List* lines, List* functions, int index)
+{
+	while (listSize(functions)>0)
+	{
+		List* fnc = (List*)listRemove(functions, 0);
+		while (listSize(fnc)>0)
+		{
+			Data* line = (Data*)listRemove(fnc,0);
+			listInsert(lines, line, index++);
+		}
+		delHead(fnc);
+	}
 }
 
 void parseFile(List* lines)
@@ -310,12 +332,18 @@ void parseFile(List* lines)
 		if (strcmp("class",d->line)==0)
 		{
 			//parseFunction(lines, &a, &depth);
-			parseFunctions(lines, a);
+			//pull functions out of class
+			List* functions = parseFunctions(lines, a);
+			do 
+			{
+				d = (Data*)listGet(lines,++a);
+			} while (strcmp(d->line, "}")!=0);
+			insertFunctions(lines, functions, a+1);
 		}
 	}
 }
 
-//OUTPUT functions
+/******************************************* OUTPUT functions ***********************************************************/
 
 void printNewLine(int depth, List* lines, int index)
 {

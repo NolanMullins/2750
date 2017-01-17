@@ -22,6 +22,12 @@ Node* createNode(void* data)
 	newNode->next = NULL;
 	return newNode;
 }
+void delHead(List* head)
+{
+	if (listSize(head) > 0)
+		printf("List Size on head deletion: %d\n", listSize(head));
+	free(head);
+}
 //can be optimized once code is checked
 Node* get(List* head, int index)
 {

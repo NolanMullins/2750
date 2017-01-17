@@ -1,9 +1,35 @@
-class a
-{
-	yolo;
-	int fn()
-	{
+#include <stdio.h>
+#include <stdlib.h>
 
+//test
+class A {
+	int a;
+	int fn(){ //test
+		return 0;
+	}
+	void ryan<3()
+	{
+		
 	}
 }
-//tmp
+//
+class B {
+	int b;
+	int fnB(int a, char b)
+	{
+		return 0;
+	}
+}
+
+/*this is a test
+ * 
+ */
+int main()
+{
+	printf("class a {");
+	/*for (int a = 0; a < 10; a++)//yikes
+	{
+
+	}*/
+	return 0;
+}
