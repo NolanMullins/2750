@@ -380,9 +380,19 @@ void parseFile(List* lines)
 				d = (Data*)listGet(lines,++a);
 			} while (strcmp(d->line, "}")!=0);
 			//insert the functions
+			int sizeOfFunctions = 0;
+			for (int i = 0; i < listSize(functions); i++)
+			{
+				List* fnc = (List*)listGet(functions, i);
+				sizeOfFunctions += listSize(fnc);
+			}
 			insertFunctions(lines, functions, a+1);
 			//calculate offset before passing functions in, move to location after funtions
 			//generate constructer there
+			a += sizeOfFunctions+1;
+			char tmp[256];
+			strcpy(tmp, "//constructer");
+			listInsert(lines, createLine(tmp), a++);
 		}
 	}
 }
