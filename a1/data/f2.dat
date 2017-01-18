@@ -8,7 +8,13 @@ class B {
             printf("class B {\"\n"); // another comment //
         }
         return (b+c);
-       
+        /*
+        class B {
+            int a,b;
+            int add(int b, int c) {
+            if (b == '\\'){
+                printf("class B {\"\n"); // another comment //
+        */
     }
 }
 

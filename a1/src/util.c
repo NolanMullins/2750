@@ -148,15 +148,13 @@ List* genFncPtrs(List* functions)
 		Data* type = (Data*)listGet(fnc, 0);
 		Data* name = (Data*)listGet(fnc,1);
 		char* fncPtrString = createFncPtr(name->line);
-		//had to strcpy the string out else it got deleted for some reason
-		char stringType[strlen(type->line)+1];
-		strcpy(stringType, type->line);
-		listAdd(fncPtr, createLine(stringType));
-		listAdd(fncPtr, createLine(fncPtrString));
-		//doing it direct seg faulted
-		char tmp[2];
-		strcpy(tmp, ";");
-		listAdd(fncPtr, createLine(tmp));//createLine(";"));
+
+		//char stringType[strlen(type->line)+1];
+		//strcpy(stringType, type->line);
+		listAdd(fncPtr, createLineSafe(type->line));
+		listAdd(fncPtr, createLineSafe(fncPtrString));
+
+		listAdd(fncPtr, createLineSafe(";"));//createLine(";"));
 		free(fncPtrString);
 		listAdd(ptrs, fncPtr);
 	}
@@ -272,7 +270,15 @@ List* generateConstructor(List* functions, char* className)
 	//add function pointers
 	for (int a = 0; a < listSize(functions); a++)
 	{
-
+		char ass[256];
+		List* fnc = (List*)listGet(functions, a);
+		char* fncName = ((Data*)listGet(fnc,1))->line;
+		strcpy(ass, "myS->");
+		strcat(ass,fncName);
+		listAdd(lines, createLineSafe(ass));
+		listAdd(lines, createLineSafe("="));
+		listAdd(lines, createLineSafe(fncName));
+		listAdd(lines, createLineSafe(";"));
 	}
 	listAdd(lines, createLineSafe("}"));
 	return lines;

@@ -7,7 +7,7 @@ class A {
 	int fn(){ //test
 		return 0;
 	}
-	void ryan<3()
+	void ryan(long b)
 	{
 		
 	}
