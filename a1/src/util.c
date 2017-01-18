@@ -125,30 +125,7 @@ void replaceInList(List* list, char* remove, char* place)
 	}
 }
 
-//OLD
-char* createFunctionName(List* lines, char* className, int* startIndex)
-{
-	int a  = *startIndex;
-	Data* last = (Data*)listGet(lines,a-1);
-	Data* d = (Data*)listGet(lines, a);
-	char* oldName = last->line;
-	char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(className)+1));
-	strcpy(newName, className);
-	strcat(newName,oldName);
-	//free(oldName);
-	//append parameters to function name
-	while (strcmp(")",d->line)!=0)
-	{
-		d = (Data*)listGet(lines,++a);
-		if (strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
-		{
-			newName = append(newName, d->line[0]);
-			a++;
-		}
-	}
-	*startIndex = a;
-	return newName;
-}
+/****************************************** Functionality *******************************************/
 
 char* createFncPtr(char* fncName)
 {
@@ -276,60 +253,6 @@ List* parseFunctions(List* lines, int a)
 			depth--;
 	}
 	return functions;
-}
-
-//OLD
-void parseFunction(List* lines, int* startIndex, int* depth)
-{
-	int firstFnc = 0;
-	int tagged = 0;
-	int a = *startIndex;
-	Data* d = (Data*)listGet(lines,a);
-	free(d->line);
-	char* tmp = malloc(sizeof(char)*7);
-	strcpy(tmp, "struct");
-	d->line = tmp;
-	char * name = ((Data*)listGet(lines,a+1))->line;
-	while ( a < listSize(lines) && (*depth != 0 || strcmp("}",d->line)!=0))
-	{
-		d = (Data*)listGet(lines,++a);
-		//locate first function
-		if (strcmp("(",d->line)==0 && *depth==1 && tagged==0)
-		{
-			firstFnc = a-2;
-			tagged = 1;
-		}
-		//edit function names
-		if (strcmp("(",d->line)==0 && *depth==1)
-		{
-			Data* last = (Data*)listGet(lines,a-1);
-			Data* type = (Data*)listGet(lines,a-2);
-			char* fncName = createFunctionName(lines, name, &a);
-			//create function pointer
-			char* fncPtrString = createFncPtr(fncName);
-			listInsert(lines, createLineSafe(type->line), firstFnc++);
-			listInsert(lines, createLineSafe(fncPtrString), firstFnc++);
-			listInsert(lines, createLineSafe(";"), firstFnc++);
-			free(fncPtrString);
-			free(last->line);
-			a+=3;
-			last->line = fncName;
-		}
-
-		if (strcmp("{",d->line)==0)
-			(*depth)++;
-			
-		if (strcmp("}",d->line)==0)
-			(*depth)--;
-	}
-
-	tagged = 0;
-	Data* node = (Data*)listRemove(lines, a);
-	Data* semi = createLineSafe(";");
-	listInsert(lines, node,firstFnc);
-	listInsert(lines, semi,firstFnc+1);
-	a++;
-	*startIndex = a;
 }
 
 void insertFunctions(List* lines, List* functions, int index)
