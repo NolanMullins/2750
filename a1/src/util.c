@@ -255,6 +255,29 @@ List* parseFunctions(List* lines, int a)
 	return functions;
 }
 
+List* generateConstructor(List* functions, char* className)
+{
+	List* lines = init();
+	listAdd(lines, createLineSafe("struct*"));
+	char name[256];
+	strcpy(name, "constructor");
+	strcat(name, className);
+	listAdd(lines, createLineSafe(name));
+	char param[256];
+	strcpy(param, "( struct ");
+	strcat(param, className);
+	strcat(param, "* myS )");
+	listAdd(lines, createLineSafe(param));
+	listAdd(lines, createLineSafe("{"));
+	//add function pointers
+	for (int a = 0; a < listSize(functions); a++)
+	{
+
+	}
+	listAdd(lines, createLineSafe("}"));
+	return lines;
+}
+
 void insertFunctions(List* lines, List* functions, int index)
 {
 	while (listSize(functions)>0)
@@ -271,6 +294,18 @@ void insertFunctions(List* lines, List* functions, int index)
 	}
 }
 
+void insertFunction(List* lines, List* function, int index)
+{
+	//printf("%s\n", ((Data*)listGet(fnc,0))->line);
+	//function type not correctly inserted into list
+	while (listSize(function)>0)
+	{
+		Data* line = (Data*)listRemove(function,0);
+		listInsert(lines, line, index++);
+	}
+	delHead(function);
+}
+
 void parseFile(List* lines)
 {
 	//int size = listSize(lines);
@@ -285,11 +320,14 @@ void parseFile(List* lines)
 			char* s = malloc(sizeof(char)*(strlen("struct")+1));
 			strcpy(s,"struct");
 			d->line = s;
+			char* className = ((Data*)listGet(lines,a+1))->line;
 			//parseFunction(lines, &a, &depth);
 			//pull functions out of class
 			List* functions = parseFunctions(lines, a);
 			//Generate function pointers
 			List* ptrs = genFncPtrs(functions);
+			//gen contructor
+			List* con = generateConstructor(functions, className);
 			//move to end of class
 			do 
 			{
@@ -313,9 +351,13 @@ void parseFile(List* lines)
 			//calculate offset before passing functions in, move to location after funtions
 			//generate constructer there
 			a += sizeOfFunctions+1;
-			char tmp[256];
-			strcpy(tmp, "//constructer");
-			listInsert(lines, createLine(tmp), a++);
+			int sizeOfCon = listSize(con);
+			//insert constructor
+			insertFunction(lines, con, a);
+			a += sizeOfCon;
+			//char tmp[256];
+			//strcpy(tmp, "//constructer");
+			//listInsert(lines, createLine(tmp), a++);
 		}
 	}
 }
