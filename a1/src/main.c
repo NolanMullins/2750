@@ -3,6 +3,12 @@
 #include <util.h>
 #include <string.h>
 
+void delData(void* data)
+{
+	free(((Data*)data)->line);
+	free((Data*)data);
+}
+
 int main()
 {
 	List* myList = init();
@@ -14,6 +20,8 @@ int main()
 	parseFile(myList);
 
 	outputCode(myList);
+
+	listClear(myList, delData);
 
 	//replaceInList(myList, "class", "struct");
 	//outputCode(myList);

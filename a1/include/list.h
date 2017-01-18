@@ -22,6 +22,7 @@ typedef struct head
 	Node* list;
 } List;
 
+void throwError(char* msg);
 List* init();
 void listAdd (List* head, void* data);
 void* listGet(List* head, int index);

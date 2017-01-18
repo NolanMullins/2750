@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+int a;
+
+
+	// simple function outside of a class 
+float product(float a, float b) {
+   return( a*b );
+}
+
+
+
+int main(int argc, char *argv[]) {
+	//Need to identify class variables instead of defientions
+	//class A myA;
+	//class B myB;
+	int value;
+
+   //printf("Hello \" there\n");
+   //strcpy(str, "A string containing the word class may be tricky");
+
+   a = 4;
+   value = 1;
+
+   myA.print1(value);
+   myA.print2();
+   myA.print3();
+
+   myB.print4();
+
+}

@@ -39,17 +39,21 @@ char* append(char* line, char c)
 List* convertToList(char* file, List* list)
 {
 	FILE* f = fopen(file, "r");
+	if (f == NULL)
+		throwError("No File Found");
 	char tmp = getc(f);
 	char last = '0';
 	int flag = 0;
+	char line[512];
+	line[0] = '\0';
 	while (tmp != EOF)
 	{
-		char line[256];
 		if (tmp == '\t' || tmp == ' ' || tmp == '\n' || tmp == '\r')
 		{
 			if (flag!=1)
 			{
 				listAdd(list, createLine(line));
+				line[0] = '\0';
 				flag = 1;
 			}
 		}
@@ -59,6 +63,7 @@ List* convertToList(char* file, List* list)
 				listAdd(list, createLine(line));
 			append(line, tmp);
 			listAdd(list, createLine(line));
+			line[0] = '\0';
 			flag = 1;
 		}
 		//parse in strings
@@ -75,6 +80,7 @@ List* convertToList(char* file, List* list)
 			}
 			append(line, tmp);
 			listAdd(list, createLine(line));
+			line[0] = '\0';
 			last = '0';
 		}
 		else if (tmp == '/' && last == '/')
@@ -311,6 +317,7 @@ void insertFunctions(List* lines, List* functions, int index)
 		}
 		delHead(fnc);
 	}
+	delHead(functions);
 }
 
 void insertFunction(List* lines, List* function, int index)
