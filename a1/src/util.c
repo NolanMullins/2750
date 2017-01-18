@@ -132,7 +132,7 @@ char* createFncPtr(char* fncName)
 	char* ptr = malloc(sizeof(char)*(strlen(fncName)+5+1));
 	strcpy(ptr, "(*");
 	strcat(ptr, fncName);
-	strcat(ptr, ")()");
+	strcat(ptr, ")");
 	return ptr;
 }
 
@@ -153,6 +153,19 @@ List* genFncPtrs(List* functions)
 		//strcpy(stringType, type->line);
 		listAdd(fncPtr, createLineSafe(type->line));
 		listAdd(fncPtr, createLineSafe(fncPtrString));
+
+		int c = 2;
+		Data* d;
+		int depth = 0;
+		do
+		{
+			d = (Data*)listGet(fnc, c++);
+			listAdd(fncPtr, createLineSafe(d->line));
+			if (strcmp("(", d->line)==0)
+				depth++;
+			if (strcmp(")", d->line)==0)
+				depth--;
+		} while (strcmp(")",d->line)!=0 && depth != 0);
 
 		listAdd(fncPtr, createLineSafe(";"));//createLine(";"));
 		free(fncPtrString);
