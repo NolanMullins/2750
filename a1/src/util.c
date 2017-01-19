@@ -66,6 +66,14 @@ List* convertToList(char* file, List* list)
 			line[0] = '\0';
 			flag = 1;
 		}
+		else if (tmp == '*' && last != '/')
+		{
+			if (strlen(line)>0)
+				listAdd(list, createLine(line));
+			append(line, tmp);
+			listAdd(list, createLine(line));
+			flag = 1;
+		}
 		//parse in strings
 		else if (tmp == '"')
 		{
@@ -158,6 +166,15 @@ int isFunction(List* lines, int startIndex)
 		if (strcmp(d->line, ";") == 0)
 			return 0;
 	}
+	return 0;
+}
+
+int isDataType(char* string)
+{
+	char* types[] = {"unsigned", "char", "int", "short", "long", "float", "double", "void", "*"};
+	for (int a = 0; a < 9; a++)
+		if (strcmp(types[a], string)==0)
+			return 1;
 	return 0;
 }
 
@@ -407,7 +424,26 @@ void parseFile(List* lines)
 		{
 			//Need to identify variables and insert them into this list
 			//List* classVars = init();
-
+			int i = a;
+			while (i<listSize(lines) && strcmp("{", ((Data*)listGet(lines,i++))->line) != 0);
+			//loop through variable lines
+			while (i < listSize(lines) && isFunction(lines, ++i) == 0)
+			{
+				//looop through data type strings
+				i--;
+				while (++i < listSize(lines) && isDataType(((Data*)listGet(lines,i))->line) == 1);
+				//read in var names
+				Data* myData;
+				i--;
+				do
+				{
+					myData = (Data*)listGet(lines,++i);
+					//printf("Looking at: '%s'\n", myData->line);
+					if (!(strcmp(",", myData->line) == 0 || strcmp("=", myData->line) == 0 || strcmp(";", myData->line) == 0))
+						printf("Class %s Var found: %s\n", ((Data*)listGet(lines,a+1))->line,myData->line);
+				}
+				while (i < listSize(lines) && !(strcmp(";",myData->line) == 0 || strcmp("=", myData->line) == 0));
+			}
 			//after gathering functions, parse them looking for these vars and if so
 			//add a struct className to the params
 
@@ -507,6 +543,8 @@ void outputCode(List* lines)
 			continue;
 		}
 		if (a < size-1 && strcmp(";",((Data*)listGet(lines,a+1))->line)==0)
+			printf("%s", d->line);
+		else if (strcmp(d->line, "*") == 0)
 			printf("%s", d->line);
 		else
 			printf("%s ", d->line);

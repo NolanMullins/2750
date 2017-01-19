@@ -3,7 +3,8 @@
 
 //test
 class A {
-	int a;
+	int* a;
+	char *b;
 	int fn(){ //test
 		return 0;
 	}
