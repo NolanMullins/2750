@@ -26,6 +26,7 @@ class B {
  */
 int main()
 {
+	class A a;
 	printf("class a {");
 	/*for (int a = 0; a < 10; a++)//yikes
 	{

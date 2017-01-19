@@ -133,6 +133,34 @@ void replaceInList(List* list, char* remove, char* place)
 
 /****************************************** Functionality *******************************************/
 
+//return 1 if a class else 0 (Should be called after finding "class")
+int isClass(List* lines, int startIndex)
+{
+	while (startIndex < listSize(lines))
+	{
+		Data* d = (Data*)listGet(lines, startIndex++);
+		if (strcmp(d->line, "{") == 0)
+			return 1;
+		if (strcmp(d->line, ";") == 0)
+			return 0;
+	}
+	return 0;
+}
+
+//returns 1 if function else 0
+int isFunction(List* lines, int startIndex)
+{
+	while (startIndex < listSize(lines))
+	{
+		Data* d = (Data*)listGet(lines, startIndex++);
+		if (strcmp(d->line, "{") == 0)
+			return 1;
+		if (strcmp(d->line, ";") == 0)
+			return 0;
+	}
+	return 0;
+}
+
 char* createFncPtr(char* fncName)
 {
 	char* ptr = malloc(sizeof(char)*(strlen(fncName)+5+1));
@@ -275,7 +303,7 @@ List* parseFunctions(List* lines, int a)
 List* generateConstructor(List* functions, char* className)
 {
 	List* lines = init();
-	listAdd(lines, createLineSafe("struct*"));
+	listAdd(lines, createLineSafe("void"));
 	char name[256];
 	strcpy(name, "constructor");
 	strcat(name, className);
@@ -332,6 +360,41 @@ void insertFunction(List* lines, List* function, int index)
 	delHead(function);
 }
 
+//will run through a function and correct class initilization
+void functionProcessor(List* function, int start)
+{
+	int index = start;
+	int depth = 0;
+	while (start < listSize(function))
+	{
+		Data* d = (Data*)listGet(function, index++);
+		if (strcmp("{", d->line) == 0)
+			depth++;
+		else if (strcmp("}", d->line) == 0)
+			if (--depth == 0)
+				return;
+		if (strcmp("class", d->line) == 0)
+		{
+			free(d->line);
+			char* tmp = malloc(sizeof(char)*7);
+			strcpy(tmp, "struct");
+			d->line = tmp;
+			Data* type = (Data*)listGet(function, index);
+			Data* var = (Data*)listGet(function, ++index);
+			while(++index < listSize(function) && strcmp(";", ((Data*)listGet(function, index))->line) != 0);
+			//insert constuctor
+			char con[256];
+			strcpy (con, "constructor");
+			strcat(con, type->line);
+			strcat(con, "(&");
+			strcat(con, var->line);
+			strcat(con, ")");
+			listInsert(function, createLineSafe(con), ++index);
+			listInsert(function, createLineSafe(";"), ++index);
+		}
+	}
+}
+
 void parseFile(List* lines)
 {
 	//int size = listSize(lines);
@@ -340,7 +403,7 @@ void parseFile(List* lines)
 	{
 		Data* d = (Data*)listGet(lines,a);
 		//parse function here
-		if (strcmp("class",d->line)==0)
+		if (strcmp("class",d->line)==0 && isClass(lines, a) == 1)
 		{
 			free(d->line);
 			char* s = malloc(sizeof(char)*(strlen("struct")+1));
@@ -384,6 +447,11 @@ void parseFile(List* lines)
 			//char tmp[256];
 			//strcpy(tmp, "//constructer");
 			//listInsert(lines, createLine(tmp), a++);
+		}
+		else if (strcmp("(", d->line) == 0 && isFunction(lines, a) == 1)
+		{
+			//printf("Function found: %s\n", ((Data*)listGet(lines, a-1))->line);
+			functionProcessor(lines, a-2);
 		}
 	}
 }
