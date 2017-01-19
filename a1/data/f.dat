@@ -17,6 +17,7 @@ class B {
 	int b;
 	int fnB(int a, char b)
 	{
+		class A tmp;
 		return 0;
 	}
 }

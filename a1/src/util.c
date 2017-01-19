@@ -405,6 +405,12 @@ void parseFile(List* lines)
 		//parse function here
 		if (strcmp("class",d->line)==0 && isClass(lines, a) == 1)
 		{
+			//Need to identify variables and insert them into this list
+			//List* classVars = init();
+
+			//after gathering functions, parse them looking for these vars and if so
+			//add a struct className to the params
+
 			free(d->line);
 			char* s = malloc(sizeof(char)*(strlen("struct")+1));
 			strcpy(s,"struct");
@@ -417,6 +423,12 @@ void parseFile(List* lines)
 			List* ptrs = genFncPtrs(functions);
 			//gen contructor
 			List* con = generateConstructor(functions, className);
+			//make edits to function
+			for (int i = 0; i < listSize(functions); i++)
+			{
+				List* fnc = (List*)listGet(functions, i);
+				functionProcessor(fnc, 0);
+			}
 			//move to end of class
 			do 
 			{
