@@ -5,17 +5,21 @@
 class A {
 	int* a;
 	char *b;
+	long long f;
+	int tmp;
 	int fn(){ //test
+		a =0;
 		return 0;
 	}
 	void ryan(long b)
 	{
-		
+		char tmp;
+		tmp= f;
+		a = b;
 	}
 }
 //
 class B {
-	int b;
 	int fnB(int a, char b)
 	{
 		class A tmp;
