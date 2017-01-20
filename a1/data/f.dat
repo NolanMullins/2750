@@ -32,6 +32,11 @@ class C
 	
 }
 
+   // simple function outside of a class 
+float product(float a, float b) {
+   return( a*b );
+}
+
 /*this is a test
  * 
  */

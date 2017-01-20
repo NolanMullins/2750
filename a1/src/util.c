@@ -106,6 +106,8 @@ List* convertToList(char* file, List* list)
 				last = tmp;
 				tmp = getc(f);
 			}
+			flag = 1;
+			listAdd(list, createLine(line));
 		}
 		else if (tmp == '*' && last == '/')
 		{
@@ -693,3 +695,7 @@ void outputCode(List* lines)
 			printNewLine(depth, lines, a);
 	}
 }
+
+
+
+// :)
