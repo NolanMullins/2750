@@ -134,7 +134,7 @@ List* convertToList(char* file, List* list)
 			char last = tmp;
 			append(line, tmp);
 			tmp = getc(f);
-			while (tmp != '"' && last != '\\')
+			while (!(tmp == '"' && last != '\\'))
 			{
 				last = tmp;
 				append(line, tmp);
@@ -142,7 +142,7 @@ List* convertToList(char* file, List* list)
 			}
 			append(line, tmp);
 			listAdd(list, createLine(line));
-			line[0] = '\0';
+			//line[0] = '\0';
 			last = '0';
 		}
 		else
