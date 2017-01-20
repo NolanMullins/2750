@@ -457,7 +457,7 @@ int checkEndVar(char* string)
 	return 0;
 }
 
-void checkFncForClassRef(List* function, List* classVars)
+int checkFncForClassRef(List* function, List* classVars, char* className)
 {
 	int found[listSize(classVars)];
 	for (int a = 0; a < listSize(classVars); a++)
@@ -510,7 +510,25 @@ void checkFncForClassRef(List* function, List* classVars)
 		
 	}
 	if (flag == 1)
-			printf("NEED TO EDIT FNC PARAM\n");
+	{
+		int a = 0, depth = 0;
+		Data* d = (Data*)listGet(function,a);
+		while (strcmp(")", d->line) != 0 || --depth != 0)
+		{
+			//if (strcmp(")", d->line) == 0) depth--;
+			if (strcmp("(", d->line) == 0) depth++;
+			d = (Data*)listGet(function,++a);
+		}
+		char param[256];
+		if (a > 4)
+			strcpy(param, ", struct");
+		else 
+			strcpy(param, "struct ");
+		strcat(param, className);
+		strcat(param, "* myStruct");
+		listInsert(function, createLineSafe(param), a);
+	}
+	return flag;
 }
 
 List* identifyClassVars(List* lines, int start)
@@ -567,7 +585,11 @@ void parseFile(List* lines)
 
 			//check for class var refs in functions
 			for (int i = 0; i < listSize(functions); i++)
-				checkFncForClassRef((List*)listGet(functions, i), classVars);
+			{
+				int flag = checkFncForClassRef((List*)listGet(functions, i), classVars, className);
+				if (flag == 1)
+					printf("Need to edit: %s\n", ((Data*)listGet((List*)listGet(functions, i),1))->line);
+			}
 
 			//Generate function pointers
 			List* ptrs = genFncPtrs(functions);

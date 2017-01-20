@@ -27,12 +27,18 @@ class B {
 	}
 }
 
+class C
+{
+	
+}
+
 /*this is a test
  * 
  */
 int main()
 {
 	class A a;
+	class C c;
 	printf("class a {");
 	/*for (int a = 0; a < 10; a++)//yikes
 	{
