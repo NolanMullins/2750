@@ -15,6 +15,11 @@ class A
 		c = a;
 	}
 
+	void fn(long long tmp)
+	{
+
+	}
+
 	class A* gen()
 	{
 		class A* b = malloc(sizeof(class A));
@@ -35,9 +40,10 @@ int main()
 	class A a;
 	class A* b = malloc(sizeof(class A));
 	int i = 0, j = 0;
+	long long var;
 	b->fn(&i,j);
 	char myC;
-	a.fn();
-	a.fn(a,myC);
+	a.fn(var);
+	a.fn(j,myC);
 	return 0;
 }

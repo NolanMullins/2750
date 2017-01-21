@@ -89,7 +89,7 @@ List* convertToList(char* file, List* list)
 				flag = 1;
 			}
 		}
-		else if (tmp == ';' || tmp == '(' || tmp == ')' || tmp == '{' || tmp == '}' || tmp == ',' || tmp == '.')
+		else if (tmp == ';' || tmp == '(' || tmp == ')' || tmp == '{' || tmp == '}' || tmp == ',' || tmp == '.' || tmp == '&')
 		{
 			if (flag == 0)
 				listAdd(list, createLine(line));
@@ -209,7 +209,7 @@ int isFunction(List* lines, int startIndex)
 //returns 1 if data type, 0 if not
 int isDataType(char* string)
 {
-	char* types[] = {"unsigned", "char", "int", "short", "long", "float", "double", "void", "*"};
+	char* types[] = {"unsigned", "char", "int", "short", "long", "float", "double", "void", "*", "signed"};
 	for (int a = 0; a < 9; a++)
 		if (strcmp(types[a], string)==0)
 			return 1;
@@ -278,10 +278,9 @@ char* getFncName(List* fnc, char* className)
 	while (strcmp(")",d->line)!=0)
 	{
 		d = (Data*)listGet(fnc,++a);
-		if (strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
+		if (isDataType(d->line) == 1 && strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
 		{
 			newName = append(newName, d->line[0]);
-			a++;
 		}
 	}
 	return newName;
@@ -415,6 +414,56 @@ void insertFunction(List* lines, List* function, int index)
 	delHead(function);
 }
 
+char* getVarType(List* lines, int indexOfVar, char* varName)
+{
+	int depth = 0;
+	char* type = malloc(sizeof(char)*21);
+	type[0] = '\0';
+	int index = 0;
+	for (int a = indexOfVar-1; a > 0; a--)
+	{
+		Data* d = (Data*)listGet(lines, a);
+		if (strcmp("{", d->line) == 0)
+			depth--;
+		if (strcmp("}", d->line) == 0)
+			depth++;
+		if (strcmp(varName, d->line) == 0 && isDataType(((Data*)listGet(lines, a-1))->line) == 1)
+		{
+			d = (Data*)listGet(lines, --a);
+			while (isDataType(d->line) == 1)
+			{
+				if (strcmp("*", d->line) != 0)
+					type[index++] = d->line[0];
+				d = (Data*)listGet(lines, --a);
+			}
+			type[index] = '\0';
+			return type;
+		}
+		else if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) == 0)
+		{
+			int newA = a;
+			Data* search = (Data*)listGet(lines, newA);
+			do
+			{
+				search = (Data*)listGet(lines, --newA);
+			} while (newA > 0 && !(isDataType(search->line) == 1 || strcmp("(", search->line) == 0));
+			if (strcmp("(",search->line) != 0)
+			{
+				d = (Data*)listGet(lines, --a);
+				while (isDataType(d->line) == 1)
+				{
+					if (strcmp("*", d->line) != 0)
+						type[index++] = d->line[0];
+					d = (Data*)listGet(lines, --a);
+				}
+				type[index] = '\0';
+				return type;
+				}
+		}
+	}
+	return type;
+}
+
 //will run through a function and correct class initilization
 void functionProcessor(List* lines, List* function, int start)
 {
@@ -450,9 +499,9 @@ void functionProcessor(List* lines, List* function, int start)
 		if (strcmp(".", d->line) == 0 || strcmp("->", d->line) == 0)
 		{
 			Data* name = (Data*)listGet(function, index-2);
-			printf("FN CALL: '%s'\n", name->line);
 			int c = index;
 			int myDepth = 0;
+			Data* fncName = (Data*)listGet(function, index);
 			Data* tmp = (Data*)listGet(function, c);
 			do 
 			{
@@ -461,8 +510,22 @@ void functionProcessor(List* lines, List* function, int start)
 					myDepth++;
 				else if (strcmp(")", tmp->line) == 0)
 					myDepth--;
-				else if (strcmp(",", tmp->line) != 0)
-					printf("NEED TO LOOK UP: %s\n", tmp->line);
+				else if (strcmp(",", tmp->line) != 0 && strcmp("&", tmp->line) != 0)
+				{
+					char* type = getVarType(lines, c, tmp->line);
+					if (strlen(type) == 0)
+					{
+						free(type);
+						continue;
+					}
+					char newName[256];
+					strcpy(newName, fncName->line);
+					strcat(newName, type);
+					free(fncName->line);
+					free(type);
+					fncName->line = strgen(newName);
+					//printf("NEED TO LOOK UP: '%s' Type: '%s'\n", tmp->line, getVarType(lines, c, tmp->line));
+				}
 			} while (strcmp(")", tmp->line) != 0 && depth != 0);
 			char newLine[256];
 			if (c-index > 2)
@@ -606,11 +669,7 @@ void parseFile(List* lines)
 
 			//check for class var refs in functions
 			for (int i = 0; i < listSize(functions); i++)
-			//{
 				checkFncForClassRef((List*)listGet(functions, i), classVars, className);
-				//if (flag == 1)
-					//printf("Need to edit: %s\n", ((Data*)listGet((List*)listGet(functions, i),1))->line);
-			//}
 
 			//Generate function pointers
 			List* ptrs = genFncPtrs(functions);
