@@ -206,6 +206,21 @@ int isFunction(List* lines, int startIndex)
 	return 0;
 }
 
+// returns 1 if a ( comes before a ) or ;
+int checkForBrk(List* lines, int startIndex)
+{
+	Data* d = (Data*)listGet(lines, startIndex);
+	do
+	{
+		d = (Data*)listGet(lines, startIndex++);
+		if (strcmp("(", d->line) == 0)
+			return 1;
+		if (strcmp(")", d->line) == 0)
+			return 0;
+	} while (startIndex < listSize(lines) && strcmp(";", d->line));
+	return 0;
+}
+
 //returns 1 if data type, 0 if not
 int isDataType(char* string)
 {
@@ -449,16 +464,16 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 			} while (newA > 0 && !(isDataType(search->line) == 1 || strcmp("(", search->line) == 0));
 			if (strcmp("(",search->line) != 0)
 			{
-				d = (Data*)listGet(lines, --a);
+				d = (Data*)listGet(lines, newA);
 				while (isDataType(d->line) == 1)
 				{
 					if (strcmp("*", d->line) != 0)
 						type[index++] = d->line[0];
-					d = (Data*)listGet(lines, --a);
+					d = (Data*)listGet(lines, --newA);
 				}
 				type[index] = '\0';
 				return type;
-				}
+			}
 		}
 	}
 	return type;
@@ -583,7 +598,7 @@ void functionProcessor(List* lines, List* function, int start)
 				
 			} while (strcmp(";", var->line) != 0);
 		}
-		if (strcmp(".", d->line) == 0 || strcmp("->", d->line) == 0)
+		if ((strcmp(".", d->line) == 0 || strcmp("->", d->line) == 0) && checkForBrk(lines, index-1) == 1)
 		{
 			Data* name = (Data*)listGet(function, index-2);
 			int c = index;
@@ -607,7 +622,7 @@ void functionProcessor(List* lines, List* function, int start)
 					myDepth++;
 				else if (strcmp(")", tmp->line) == 0)
 					myDepth--;
-				else if (strcmp(",", tmp->line) != 0 && strcmp("&", tmp->line) != 0)
+				else if (strcmp(",", tmp->line) != 0 && strcmp("&", tmp->line) != 0 && strcmp(";", tmp->line) != 0)
 				{
 					char* type = getVarType(lines, c, tmp->line);
 					if (strlen(structType) == 0)
