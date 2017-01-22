@@ -356,6 +356,23 @@ List* parseFunctions(List* lines, int a)
 					type->line = strgen(newType);
 					a--;
 				}
+				else if (strcmp("class", ((Data*)listGet(lines, a-4))->line) == 0)
+				{	
+					//merge data type info into one node
+					Data* tmp = (Data*)listRemove(lines, a-4);
+					Data* name = (Data*)listRemove(lines, a-4);
+					Data* ptr = (Data*)listGet(lines, a-4);
+
+					char newType[256];
+					strcpy(newType, "struct ");
+					strcat(newType, name->line);
+					strcat(newType, ptr->line);
+					free(ptr->line);
+					ptr->line = strgen(newType);
+					delLine(tmp);
+					delLine(name);
+					a-=2;
+				}
 			}
 			List* myList = removeFnc(lines, a-2);
 			char* fncName = getFncName(myList, className);

@@ -1,23 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+class C
+{
+	int a;
+};
+
 //
 class B {
-	class B* gen()
+	class C* gen()
 	{
-		class B* myB = malloc(sizeof(class B));
-		return myB;
-	}
-	class B* gen2()
-	{
-		class B* myB = malloc(sizeof(class B));
-		return myB;
+		class C* myC = malloc(sizeof(class C));
+		return myC;
 	}
 	int* gen3()
 	{
 		return NULL;
 	}
-}
+};
 
 /*this is a test
  * 
