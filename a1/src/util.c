@@ -700,7 +700,7 @@ void parseFile(List* lines)
 				List* fnc = (List*)listGet(functions, i);
 				sizeOfFunctions += listSize(fnc);
 			}
-			insertFunctions(lines, functions, a+1);
+			insertFunctions(lines, functions, a++);
 			//calculate offset before passing functions in, move to location after funtions
 			//generate constructer there
 			a += sizeOfFunctions+1;
