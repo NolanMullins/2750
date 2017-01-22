@@ -61,7 +61,7 @@ class C{
          printf("output should be 20: %d", a + (int)myB1.b +myB1.c); 
 
 		/* call the method inside the class */
-         ptintf("output should be 3: ");
+         printf("output should be 3: ");
          a = 1; b = 2;
          add(a, b);}};
 
