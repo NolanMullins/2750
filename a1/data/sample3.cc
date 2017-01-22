@@ -119,7 +119,7 @@ E {
 int main(int argc, char *argv[]) {
 class A myA;
 class B myB1,myB2, myB3;
-class B myC;
+class C myC;
 int x, y;
 char str[50];
 struct mystruct *sptr;
@@ -134,7 +134,7 @@ class E myE;
    name = malloc(sizeof(char)*100);
 
    myA.a = 5;
-   myA.a = 10;
+   myA.aa = 10;
    printf("output should be 15: ");
    myA.add();
 

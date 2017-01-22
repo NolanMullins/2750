@@ -6,9 +6,12 @@ EXE = run
 all:$(OBJQ1) 
 	gcc $(OBJQ1) -o $(EXE) $(FLAGS)
 clean:
-	rm $(OBJQ1) $(EXE)
+	rm $(OBJQ1) $(EXE) file.c a.out
 run:
 	./$(EXE)
+
+test:
+	gcc file.c $(FLAGS)
 
 main.o: src/main.c
 	gcc -c src/main.c $(FLAGS)

@@ -464,6 +464,54 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 	return type;
 }
 
+char* getStructType(List* lines, int indexOfVar, char* varName)
+{
+	int depth = 0;
+	char* type = malloc(sizeof(char)*256);
+	type[0] = '\0';
+	for (int a = indexOfVar-1; a > 0; a--)
+	{
+		Data* d = (Data*)listGet(lines, a);
+		if (strcmp("{", d->line) == 0)
+			depth--;
+		if (strcmp("}", d->line) == 0)
+			depth++;
+		//case struct A myA;
+		if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) != 0)
+		{
+			int offset = 2;
+			if (strcmp("*", ((Data*)listGet(lines, a-1))->line) == 0)
+				offset++;
+			if (strcmp("struct", ((Data*)listGet(lines, a-offset))->line) == 0)
+			{
+				d = (Data*)listGet(lines, a-offset+1);
+				strcpy(type, d->line);
+				return type;
+			}
+		}
+		//case struct A myA, myA2;
+		else if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) == 0)
+		{
+			int newA = a;
+			Data* search = (Data*)listGet(lines, newA);
+			do
+			{
+				search = (Data*)listGet(lines, --newA);
+			} while (newA > 0 && !(strcmp("struct", search->line) == 0 || strcmp("(", search->line) == 0));
+			if (strcmp("(",search->line) != 0)
+			{
+				if (strcmp("struct", ((Data*)listGet(lines, newA))->line) == 0)
+				{
+					d = (Data*)listGet(lines, newA+1);
+					strcpy(type, d->line);
+					return type;
+				}
+			}
+		}
+	}
+	return type;
+}
+
 //will run through a function and correct class initilization
 void functionProcessor(List* lines, List* function, int start)
 {
@@ -479,29 +527,78 @@ void functionProcessor(List* lines, List* function, int start)
 				return;
 		if (strcmp("class", d->line) == 0)
 		{
+			//NEED TO LOOP THIS IN ORDER TO ACCOUNT FOR struct A a1,a2;
 			free(d->line);
 			char* tmp = malloc(sizeof(char)*7);
 			strcpy(tmp, "struct");
 			d->line = tmp;
+
 			Data* type = (Data*)listGet(function, index);
-			Data* var = (Data*)listGet(function, ++index);
-			while(++index < listSize(function) && strcmp(";", ((Data*)listGet(function, index))->line) != 0);
-			//insert constuctor
-			char con[256];
-			strcpy (con, "constructor");
-			strcat(con, type->line);
-			strcat(con, "(&");
-			strcat(con, var->line);
-			strcat(con, ")");
-			listInsert(function, createLineSafe(con), ++index);
-			listInsert(function, createLineSafe(";"), ++index);
+			Data* var = (Data*)listGet(function, index);;
+			int refIndex = index;
+			int isPtr = 0;
+			do
+			{
+				index = refIndex++;
+				var = (Data*)listGet(function, refIndex);
+				if (strcmp(",", var->line) == 0 || strcmp(";", var->line) == 0)
+					continue;
+				if (strcmp("*", var->line) == 0)
+				{
+					isPtr = 1;
+					continue;
+				}
+				if (strcmp("=", var->line) == 0)
+				{
+					while(!(strcmp(",", var->line) == 0 || strcmp(";", var->line) == 0))
+					{
+						if (strcmp("class", var->line) == 0)
+						{
+							free(var->line);
+							var->line = strgen("struct");
+						}
+						var = (Data*)listGet(function, ++refIndex);
+					}
+					if (!strcmp(";", var->line) == 0)
+						continue;
+				}
+				while(++index < listSize(function) && strcmp(";", ((Data*)listGet(function, index))->line) != 0);
+				
+				if (strcmp(";", var->line) == 0)
+					continue;
+
+				//insert constuctor
+				char con[256];
+				strcpy (con, "constructor");
+				strcat(con, type->line);
+				if (isPtr == 0)
+					strcat(con, "(&");
+				else
+					strcat(con,"(");
+				strcat(con, var->line);
+				strcat(con, ")");
+				listInsert(function, createLineSafe(con), ++index);
+				listInsert(function, createLineSafe(";"), ++index);
+
+				
+			} while (strcmp(";", var->line) != 0);
 		}
 		if (strcmp(".", d->line) == 0 || strcmp("->", d->line) == 0)
 		{
 			Data* name = (Data*)listGet(function, index-2);
 			int c = index;
 			int myDepth = 0;
+
 			Data* fncName = (Data*)listGet(function, index);
+			//edit function call to include struct type
+			char* structType = getStructType(lines, index-2, name->line);
+			char newFnc[256];
+			strcpy(newFnc, structType);
+			strcat(newFnc, fncName->line);
+			free(fncName->line);
+			fncName->line = strgen(newFnc);
+			free(structType);
+
 			Data* tmp = (Data*)listGet(function, c);
 			do 
 			{
@@ -513,7 +610,7 @@ void functionProcessor(List* lines, List* function, int start)
 				else if (strcmp(",", tmp->line) != 0 && strcmp("&", tmp->line) != 0)
 				{
 					char* type = getVarType(lines, c, tmp->line);
-					if (strlen(type) == 0)
+					if (strlen(structType) == 0)
 					{
 						free(type);
 						continue;
@@ -534,6 +631,7 @@ void functionProcessor(List* lines, List* function, int start)
 				strcpy(newLine, "&");
 			strcat(newLine, name->line);
 			listInsert(function, createLineSafe(newLine), c);
+			
 		}
 	}
 }
@@ -606,7 +704,7 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 	}
 	char param[256];
 	if (a > 4)
-		strcpy(param, ", struct");
+		strcpy(param, ", struct ");
 	else 
 		strcpy(param, "struct ");
 	strcat(param, className);
@@ -693,6 +791,7 @@ void parseFile(List* lines)
 			{
 				d = (Data*)listGet(lines,++a);
 			} while (strcmp(d->line, "}")!=0);
+			a+=2; //account for };
 			//insert the functions
 			int sizeOfFunctions = 0;
 			for (int i = 0; i < listSize(functions); i++)
@@ -703,11 +802,12 @@ void parseFile(List* lines)
 			insertFunctions(lines, functions, a++);
 			//calculate offset before passing functions in, move to location after funtions
 			//generate constructer there
-			a += sizeOfFunctions+1;
+			a += sizeOfFunctions-1;
 			int sizeOfCon = listSize(con);
 			//insert constructor
 			insertFunction(lines, con, a);
 			a += sizeOfCon;
+			a-=1;
 			//clear class vars list
 			listClear(classVars, freeString);
 		}
@@ -721,7 +821,7 @@ void parseFile(List* lines)
 
 /******************************************* OUTPUT functions ***********************************************************/
 
-void printNewLine(int depth, List* lines, int index)
+void printNewLineFile(FILE* f, int depth, List* lines, int index)
 {
 	
 	int size = listSize(lines);
@@ -733,48 +833,57 @@ void printNewLine(int depth, List* lines, int index)
 	if (c==';')
 		if (((Data*)listGet(lines,index))->line[0]=='}')
 			return;
-	printf("\n");
+	fprintf(f,"\n");
 	for (int a = 0; a < depth*4; a++)
-				printf("%c", ' ');
+				fprintf(f,"%c", ' ');
 }
 
 void outputCode(List* lines)
 {
 	int size = listSize(lines);
 	int depth = 0;
+	FILE* f = fopen("file.c", "w");
 	for (int a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
 		if (strlen(d->line)>1 && d->line[0] == '/' && d->line[1] == '/')
 		{
-			printf("%s", d->line);
-			printNewLine(depth, lines, a);
+			fprintf(f,"%s", d->line);
+			printNewLineFile(f,depth, lines, a);
 			continue;
 		}
 		if (strlen(d->line)>1 && d->line[0] == '/' && d->line[1] == '*')
 		{
-			printf("%s", d->line);
-			printNewLine(depth, lines, a);
+			fprintf(f,"%s", d->line);
+			printNewLineFile(f,depth, lines, a);
 			continue;
 		}
 		if (strlen(d->line) > 1 && d->line[0] == '-' && d->line[1] == '>')
 		{
-			printf("%s", d->line);
+			fprintf(f,"%s", d->line);
 			continue;
 		}
 		if (a < size-1 && strcmp(";",((Data*)listGet(lines,a+1))->line)==0)
-			printf("%s", d->line);
+			fprintf(f,"%s", d->line);
 		else if (strcmp(d->line, "*") == 0)
-			printf("%s", d->line);
+			fprintf(f,"%s", d->line);
+		else if (a < size-1 && strcmp(".",((Data*)listGet(lines,a+1))->line)==0)
+			fprintf(f, "%s", d->line);
+		else if (strcmp(".", d->line) == 0)
+			fprintf(f, "%s", d->line);
+		else if (a < size-1 && strcmp(">",((Data*)listGet(lines,a+1))->line)==0)
+			fprintf(f, "%s", d->line);
+		else if (strcmp("<", d->line) == 0)
+			fprintf(f, "%s", d->line);
 		else
-			printf("%s ", d->line);
+			fprintf(f,"%s ", d->line);
 		if (strcmp("}",d->line)==0)
-			printNewLine(--depth, lines, a);
+			printNewLineFile(f,--depth, lines, a);
 		if (strcmp("{",d->line)==0)
-			printNewLine(++depth, lines, a);
+			printNewLineFile(f,++depth, lines, a);
 		if (d->line[strlen(d->line)-1]=='>')
-			printf("\n");
+			fprintf(f,"\n");
 		if (strcmp(";",d->line)==0)
-			printNewLine(depth, lines, a);
+			printNewLineFile(f,depth, lines, a);
 	}
 }

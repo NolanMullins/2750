@@ -40,9 +40,11 @@ float product(float a, float b) {
 
 
 int main(int argc, char *argv[]) {
-class A myA;
+class A myA, a2;
+class B* tmp = malloc(sizeof(class B));
 class B myB;
 int value;
+char str[100];
 
    printf("Hello \" there\n");
    strcpy(str, "A string containing the word class may be tricky");
@@ -55,6 +57,7 @@ int value;
    myA.print3();
 
    myB.print4();
+   a2.print1(value);
 
 }
 
