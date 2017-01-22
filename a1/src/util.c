@@ -215,7 +215,7 @@ int checkForBrk(List* lines, int startIndex)
 		d = (Data*)listGet(lines, startIndex++);
 		if (strcmp("(", d->line) == 0)
 			return 1;
-		if (strcmp(")", d->line) == 0)
+		if (strcmp(")", d->line) == 0 || strcmp("{", d->line) == 0)
 			return 0;
 	} while (startIndex < listSize(lines) && strcmp(";", d->line));
 	return 0;
@@ -825,6 +825,33 @@ void parseFile(List* lines)
 			a-=1;
 			//clear class vars list
 			listClear(classVars, freeString);
+		}
+		else if (strcmp("class",d->line)==0)
+		{
+			//swap class for struct
+			free(d->line);
+			d->line = strgen("struct");
+			Data* type = (Data*)listGet(lines, ++a);
+			Data* var = (Data*)listGet(lines, ++a);
+			//generate contructor and insert it into main
+			int i = 0;
+			do 
+			{
+				d = (Data*)listGet(lines, i++);
+			} while (strcmp("main", d->line) != 0);
+			do 
+			{
+				d = (Data*)listGet(lines, i++);
+			} while (strcmp("{", d->line) != 0);
+			//gen contructor
+			char con[256];
+			strcpy (con, "constructor");
+			strcat(con, type->line);
+			strcat(con, "(&");
+			strcat(con, var->line);
+			strcat(con, ")");
+			listInsert(lines, createLineSafe(con), i);
+			listInsert(lines, createLineSafe(";"), i+1);
 		}
 		else if (strcmp("(", d->line) == 0 && isFunction(lines, a) == 1)
 		{
