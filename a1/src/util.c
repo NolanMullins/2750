@@ -800,12 +800,17 @@ void parseFile(List* lines)
 				d = (Data*)listGet(lines,++a);
 			} while (strcmp(d->line, "}")!=0);
 			//insert function pointers into struct
+			int numPtrs = listSize(ptrs);
 			insertFunctions(lines, ptrs, a);
 			//move to the new end of the class
-			do 
+			if (numPtrs > 0)
 			{
-				d = (Data*)listGet(lines,++a);
-			} while (strcmp(d->line, "}")!=0);
+				do 
+				{
+					d = (Data*)listGet(lines,++a);
+				} while (strcmp(d->line, "}")!=0);
+				
+			}
 			a+=2; //account for };
 			//insert the functions
 			int sizeOfFunctions = 0;
