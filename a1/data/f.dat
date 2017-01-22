@@ -1,53 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//test
-class A {
-	int* a;
-	char *b;
-	long long f;
-	int tmp;
-	int fn(){ //test
-		a =0;
-		return 0;
-	}
-	void ryan(long b)
-	{
-		char tmp;
-		tmp= f;
-		a = b;
-	}
-}
 //
 class B {
-	int fnB(int a, char b)
+	class B* gen()
 	{
-		class A tmp;
-		return 0;
+		class B* myB = malloc(sizeof(class B));
+		return myB;
 	}
-}
-
-class C
-{
-	
-}
-
-   // simple function outside of a class 
-float product(float a, float b) {
-   return( a*b );
+	class B* gen2()
+	{
+		class B* myB = malloc(sizeof(class B));
+		return myB;
+	}
+	int* gen3()
+	{
+		return NULL;
+	}
 }
 
 /*this is a test
  * 
  */
+ // class
 int main()
 {
-	class A a;
-	class C c;
-	printf("class a {");
-	/*for (int a = 0; a < 10; a++)//yikes
-	{
-
-	}*/
-	return 0;
+	class B myB;
+	printf("class");
 }

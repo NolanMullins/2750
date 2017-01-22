@@ -169,7 +169,7 @@ void replaceInList(List* list, char* remove, char* place)
 		if (strcmp(remove, d->line)==0)
 		{
 			free(d->line);
-			char* ptr = malloc(sizeof(char)*strlen(place)+1);
+			char* ptr = malloc(sizeof(char)*(strlen(place)+1));
 			strcpy(ptr, place);
 			d->line = ptr;
 		}
@@ -301,6 +301,7 @@ char* getFncName(List* fnc, char* className)
 	return newName;
 }
 
+//struct ptr issue here
 List* removeFnc(List* lines, int startIndex)
 {
 	int depth = 0;
@@ -309,11 +310,6 @@ List* removeFnc(List* lines, int startIndex)
 	//printf("CALL: %s\n", d->line);
 	while (depth != 1 || strcmp("}",d->line)!=0)
 	{
-		//printf("%s\n", ((Data*)listRemove(lines, startIndex))->line);
-		//printf("%s\n", tmp->line);
-		//
-		//listAdd(fnc, (Data*)listRemove(lines, startIndex));
-		//printf("%s\n", ((Data*)listGet(fnc,listSize(fnc)-1))->line);
 		if (strcmp("{",d->line)==0)
 			depth++;
 			
@@ -323,14 +319,8 @@ List* removeFnc(List* lines, int startIndex)
 		Data* newLine = createLine(old->line);
 		listAdd(newList, newLine);
 		delLine(old);
-
-		//delLine(old);
-		//printf("test2\n");
-		//Data* tmp = createLine(old->line);
 		d = (Data*)listGet(lines,startIndex);
-		//printf("Line: %s depth:%d\n", d->line, depth);
 	}
-	//listAdd(fnc, (Data*)listRemove(lines, startIndex));
 	Data* old = (Data*)listRemove(lines, startIndex);
 	Data* tmp = createLine(old->line);
 	listAdd(newList, tmp);
@@ -339,6 +329,7 @@ List* removeFnc(List* lines, int startIndex)
 	return newList;
 }
 
+//struct ptr issue here
 List* parseFunctions(List* lines, int a)
 {
 	List* functions = init();
@@ -350,6 +341,22 @@ List* parseFunctions(List* lines, int a)
 		if (strcmp("(",d->line)==0 && depth==1)
 		{
 			//Pull the function out
+			Data* type = (Data*)listGet(lines, a-2);
+			if (strcmp("*", type->line) == 0)
+			{
+				Data* prev = (Data*)listGet(lines, a-3);
+				if (isDataType(prev->line) == 1)
+				{
+					Data* tmp = (Data*)listRemove(lines, a-3);
+					char newType[256];
+					strcpy(newType, tmp->line);
+					delLine(tmp);
+					strcat(newType, "*");
+					free(type->line);
+					type->line = strgen(newType);
+					a--;
+				}
+			}
 			List* myList = removeFnc(lines, a-2);
 			char* fncName = getFncName(myList, className);
 			Data* nameNode = (Data*)listGet(myList, 1);
@@ -542,7 +549,7 @@ void functionProcessor(List* lines, List* function, int start)
 				return;
 		if (strcmp("class", d->line) == 0)
 		{
-			//NEED TO LOOP THIS IN ORDER TO ACCOUNT FOR struct A a1,a2;
+			
 			free(d->line);
 			char* tmp = malloc(sizeof(char)*7);
 			strcpy(tmp, "struct");
@@ -577,6 +584,7 @@ void functionProcessor(List* lines, List* function, int start)
 					if (!strcmp(";", var->line) == 0)
 						continue;
 				}
+
 				while(++index < listSize(function) && strcmp(";", ((Data*)listGet(function, index))->line) != 0);
 				
 				if (strcmp(";", var->line) == 0)
@@ -772,10 +780,11 @@ void parseFile(List* lines)
 			//add a struct className to the params
 
 			free(d->line);
-			char* s = malloc(sizeof(char)*(strlen("struct")+1));
-			strcpy(s,"struct");
-			d->line = s;
+			d->line = strgen("struct");
+			if (strcmp("*",((Data*)listGet(lines,a+1))->line) == 0)
+				a++;
 			char* className = ((Data*)listGet(lines,a+1))->line;
+			
 			//parseFunction(lines, &a, &depth);
 			//pull functions out of class
 			List* functions = parseFunctions(lines, a);
