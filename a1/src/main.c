@@ -6,7 +6,7 @@
 int main()
 {
 	List* myList = init();
-	myList = convertToList("data/f.dat", myList);
+	myList = convertToList("data/f.cc", myList);
 	//int size = listSize(myList);
 	//for (int a = 0; a < listSize(myList); a++)
 		//printf("'%s'\n", ((Data*)listGet(myList,a))->line);

@@ -325,6 +325,14 @@ List* removeFnc(List* lines, int startIndex)
 	Data* tmp = createLine(old->line);
 	listAdd(newList, tmp);
 	delLine(old);
+	d = (Data*)listGet(lines,startIndex);
+	if (strcmp(";", d->line) == 0)
+	{
+		old = (Data*)listRemove(lines, startIndex);
+		tmp = createLine(old->line);
+		listAdd(newList, tmp);
+		delLine(old);
+	}
 	//return fnc;
 	return newList;
 }
@@ -704,7 +712,7 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 				{
 					//found a line referencing a class variable, need to edit the string
 					char newVar[256];
-					strcpy(newVar, "myStruct->");
+					strcpy(newVar, "myStruct999->");
 					strcat(newVar, d->line);
 					free(d->line);
 					d->line = strgen(newVar);
@@ -752,7 +760,7 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 	else 
 		strcpy(param, "struct ");
 	strcat(param, className);
-	strcat(param, "* myStruct");
+	strcat(param, "* myStruct999");
 	listInsert(function, createLineSafe(param), a);
 	return 1;
 }
