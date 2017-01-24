@@ -11,7 +11,7 @@ run:
 	./$(EXE)
 
 test:
-	gcc file.c $(FLAGS)
+	gcc file.c 
 
 main.o: src/main.c
 	gcc -c src/main.c $(FLAGS)

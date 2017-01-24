@@ -293,7 +293,7 @@ char* getFncName(List* fnc, char* className)
 	while (strcmp(")",d->line)!=0)
 	{
 		d = (Data*)listGet(fnc,++a);
-		if (isDataType(d->line) == 1 && strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0)
+		if (isDataType(d->line) == 1 && strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0 && strcmp("*",d->line)!=0)
 		{
 			newName = append(newName, d->line[0]);
 		}
@@ -356,7 +356,7 @@ List* parseFunctions(List* lines, int a)
 					type->line = strgen(newType);
 					a--;
 				}
-				else if (strcmp("class", ((Data*)listGet(lines, a-4))->line) == 0)
+				else if (strcmp("class", ((Data*)listGet(lines, a-4))->line) == 0 || strcmp("struct", ((Data*)listGet(lines, a-4))->line) == 0)
 				{	
 					//merge data type info into one node
 					Data* tmp = (Data*)listRemove(lines, a-4);
@@ -676,6 +676,7 @@ void functionProcessor(List* lines, List* function, int start)
 	}
 }
 
+//if the string is an end variable, return 1 else 0
 int checkEndVar(char* string)
 {
 	if (strcmp(";", string) == 0 || strcmp(")", string) == 0)
@@ -694,7 +695,7 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 	for(int a = 0; a < listSize(function); a++)
 	{
 		//find a data type
-		while (++a < listSize(function) && isDataType(((Data*)listGet(function,a))->line) == 0)
+		while (++a < listSize(function) && (isDataType(((Data*)listGet(function,a))->line) == 0 || strcmp("*",((Data*)listGet(function,a))->line)==0))
 		{
 			for (int b = 0; b < listSize(classVars); b++)
 			{
@@ -712,26 +713,29 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 		}
 		//move through the typing to find the names
 		a--;
-		while (++a < listSize(function) && isDataType(((Data*)listGet(function,a))->line) == 1);
+		while (++a < listSize(function) && isDataType(((Data*)listGet(function,a))->line) == 1 );
 		a--;
 		Data* myData;
+		//quick check for out of bounds
 		if (a+1 >= listSize(function))
 			break;
+		//go through all variables attached to typing and if they are a class variable mark them as found
 		do
 		{
 			myData = (Data*)listGet(function,++a);
 			if (checkEndVar(myData->line)==0 && strcmp(",", myData->line) != 0 && isDataType(myData->line) == 0)
-				//printf("Var found: %s\n", myData->line);
+			{
 				for (int b = 0; b < listSize(classVars); b++)
 				{
 					if (strcmp(myData->line, listGet(classVars,b))==0)
 						found[b] = 1;
 				}
+			}
 		}
 		while (a < listSize(function)-1 && checkEndVar(myData->line)==0);
-		//Data* d = (Data*)listGet(function, a);
-		//printf("__%s\n", d->line);
-		
+		//so the top loop can look at the next variable
+		//plz trust this works, dont touch
+		a--;
 	}
 	
 	int a = 0, depth = 0;
