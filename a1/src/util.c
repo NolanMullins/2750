@@ -403,6 +403,10 @@ List* parseFunctions(List* lines, int a)
 
 List* generateConstructor(List* functions, char* className)
 {
+	//TODO
+	/* Need to del initilized vars in function and move the 
+	 * initilization to the contructor
+	 */
 	List* lines = init();
 	listAdd(lines, createLineSafe("void"));
 	char name[256];
