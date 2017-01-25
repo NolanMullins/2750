@@ -8,7 +8,7 @@ all:$(OBJQ1)
 clean:
 	rm $(OBJQ1) $(EXE) file.c a.out
 run:
-	./$(EXE)
+	./$(EXE) data/f.cc
 
 test:
 	gcc file.c 

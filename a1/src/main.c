@@ -3,10 +3,12 @@
 #include <util.h>
 #include <string.h>
 
-int main()
+int main(int argc, char* argv[])
 {
+	if (argc < 2)
+		throwError("No file provided... exiting");
 	List* myList = init();
-	myList = convertToList("data/f.cc", myList);
+	myList = convertToList(argv[1], myList);
 	//int size = listSize(myList);
 	//for (int a = 0; a < listSize(myList); a++)
 		//printf("'%s'\n", ((Data*)listGet(myList,a))->line);
@@ -15,7 +17,7 @@ int main()
 
 	//replaceInList(myList, "class", "struct");
 
-	outputCode(myList);
+	outputCode(myList, argv[1]);
 
 	listClear(myList, delData);
 

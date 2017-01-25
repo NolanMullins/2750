@@ -18,7 +18,7 @@ struct mystruct {
 class
 B {
    float
-      abc = 1.2;
+      abc = 1.2, cba = 1;
 
    struct mystruct *  method()
    {

@@ -401,12 +401,8 @@ List* parseFunctions(List* lines, int a)
 	return functions;
 }
 
-List* generateConstructor(List* functions, char* className)
+List* generateConstructor(List* functions, List* varsToAdd, char* className)
 {
-	//TODO
-	/* Need to del initilized vars in function and move the 
-	 * initilization to the contructor
-	 */
 	List* lines = init();
 	listAdd(lines, createLineSafe("void"));
 	char name[256];
@@ -419,6 +415,12 @@ List* generateConstructor(List* functions, char* className)
 	strcat(param, "* myS )");
 	listAdd(lines, createLineSafe(param));
 	listAdd(lines, createLineSafe("{"));
+	//TODO
+	/* Need to del initilized vars in function and move the 
+	 * initilization to the contructor
+	 */
+	for (int a = 0; a < listSize(varsToAdd); a++)
+		listAdd(lines, createLineSafe(((Data*)listGet(varsToAdd, a))->line));
 	//add function pointers
 	for (int a = 0; a < listSize(functions); a++)
 	{
@@ -797,6 +799,51 @@ List* identifyClassVars(List* lines, int start)
 	return classVars;
 }
 
+List* getClassVarsInit(List* lines, int start)
+{
+	List* linesToAdd = init();
+	//Need to identify variables and insert them into this list
+	int i = start;
+	while (i<listSize(lines) && strcmp("{", ((Data*)listGet(lines,i++))->line) != 0);
+	//loop through variable lines
+	while (i < listSize(lines) && isFunction(lines, ++i) == 0)
+	{
+		//looop through data type strings
+		i--;
+		while (++i < listSize(lines) && isDataType(((Data*)listGet(lines,i))->line) == 1);
+		//read in var names
+		Data* myData;
+		i--;
+		do
+		{
+			myData = (Data*)listGet(lines,++i);
+			//printf("Looking at: '%s'\n", myData->line);
+			if (!(strcmp(",", myData->line) == 0 || strcmp("=", myData->line) == 0 || strcmp(";", myData->line) == 0))
+			{
+				//copy var name and remove assignment statement
+				if (strcmp("=", ((Data*)listGet(lines, i+1))->line) == 0)
+				{
+					char var[256];
+					strcpy(var, "myS->");
+					strcat(var, myData->line);
+					listAdd(linesToAdd, createLineSafe(var));
+					//remove assignment statement
+					myData = (Data*)listGet(lines,++i);
+					while (strcmp(",", myData->line) != 0 && strcmp(";", myData->line) != 0)
+					{
+						listAdd(linesToAdd, listRemove(lines, i));
+						myData = (Data*)listGet(lines,i);
+					}
+					listAdd(linesToAdd, createLineSafe(";"));
+				}
+			}
+				
+		}
+		while (i < listSize(lines) && !(strcmp(";",myData->line) == 0 || strcmp("=", myData->line) == 0));
+	}
+	return linesToAdd;
+}
+
 void parseFile(List* lines)
 {
 	//int size = listSize(lines);
@@ -809,9 +856,10 @@ void parseFile(List* lines)
 		{
 			//gather list of class vars
 			List* classVars = identifyClassVars(lines, a);
+			//Get variables init'd in a class scope
+			List* addToCon = getClassVarsInit(lines, a);
 			//after gathering functions, parse them looking for these vars and if so
 			//add a struct className to the params
-
 			free(d->line);
 			d->line = strgen("struct");
 			if (strcmp("*",((Data*)listGet(lines,a+1))->line) == 0)
@@ -829,7 +877,7 @@ void parseFile(List* lines)
 			//Generate function pointers
 			List* ptrs = genFncPtrs(functions);
 			//gen contructor
-			List* con = generateConstructor(functions, className);
+			List* con = generateConstructor(functions, addToCon, className);
 			//make edits to function
 			for (int i = 0; i < listSize(functions); i++)
 			{
@@ -872,6 +920,8 @@ void parseFile(List* lines)
 			a-=1;
 			//clear class vars list
 			listClear(classVars, freeString);
+			//clear other var list
+			listClear(addToCon, delData);
 		}
 		else if (strcmp("class",d->line)==0)
 		{
@@ -927,11 +977,18 @@ void printNewLineFile(FILE* f, int depth, List* lines, int index)
 				fprintf(f,"%c", ' ');
 }
 
-void outputCode(List* lines)
+void outputCode(List* lines, char* filename)
 {
 	int size = listSize(lines);
 	int depth = 0;
-	FILE* f = fopen("file.c", "w");
+	char word[256];
+	word[0] = '\0';
+	int a = 0;
+	//gen file name
+	while (filename[a] != '\0' && filename[a] != '.')
+		append(word, filename[a++]);
+	strcat(word, ".c");
+	FILE* f = fopen(word, "w");
 	for (int a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
