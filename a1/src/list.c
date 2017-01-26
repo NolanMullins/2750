@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <list.h>
-//List -> Node
+/*List -> Node */
 
-//restricted functions {
+/*restricted functions { */
 void* destroyNode(struct node* node)
 {
 	void* tmp = node -> data;
@@ -28,7 +28,7 @@ void delHead(List* head)
 		printf("List Size on head deletion: %d\n", listSize(head));
 	free(head);
 }
-//can be optimized once code is checked
+/*can be optimized once code is checked*/
 Node* get(List* head, int index)
 {
 	if (index < 0)
@@ -36,7 +36,8 @@ Node* get(List* head, int index)
 	if (head == NULL)
 		throwError("Null pointer exception");
 	Node* list = head->list;
-	for (int a = 0; a < index; a++)
+	int a;
+	for (a = 0; a < index; a++)
 	{
 		if (list == NULL)
 			throwError("index out of bounds");
@@ -46,9 +47,9 @@ Node* get(List* head, int index)
 		throwError("index out of bounds");
 	return list;
 }
-//}
+/*}*/
 
-//Used to init the list
+/*Used to init the list*/
 List* init()
 {
 	List* newHead = malloc(sizeof(List));
@@ -72,7 +73,7 @@ void listAdd (List* head, void* data)
 	list->next = newNode;
 }
 
-//Will return a reference to the data stored in the node
+/*Will return a reference to the data stored in the node*/
 void* listRemove(List* head, int index)
 {
 	if (head == NULL || head->list == NULL)
@@ -92,7 +93,7 @@ void* listRemove(List* head, int index)
 	return destroyNode(tmp);
 }
 
-//will return a reference to the data stored at the index node
+/*will return a reference to the data stored at the index node*/
 void* listGet(List* head, int index)
 {
 	return get(head, index)->data;
@@ -150,16 +151,17 @@ List* listClear(List* head, void (*des)(void* a))
 	return NULL;
 }
 
-//good enough for a linked list
+/*good enough for a linked list*/
 void sort(List* head, int (*cmp)())
 {
 	if (head==NULL)
 		throwError("Null pointer exception");
 	int size = listSize(head);
-	for(int a = 0; a < size-1; a++)
+	int a;
+	for(a = 0; a < size-1; a++)
 	{
 		Node* index = head->list;
-		//swap on head
+		/*swap on head*/
 		if (cmp(index->data, index->next->data) > 0)
 		{
 			Node* tmp = index->next->next;
@@ -168,7 +170,8 @@ void sort(List* head, int (*cmp)())
 			index->next = tmp;
 		}
 		index = head->list;
-		for (int b = 1; b < size-1-a; b++)
+		int b;
+		for (b = 1; b < size-1-a; b++)
 		{
 			Node* i = index->next;
 			Node* j = index->next->next;
@@ -184,15 +187,17 @@ void sort(List* head, int (*cmp)())
 	}
 }
 
-//never use, just to check difference in speed
+/*never use, just to check difference in speed*/
 void sort2(List* head, int (*cmp)(void* a, void* b))
 {
 	if (head==NULL)
 		throwError("Null pointer exception");
 	int size = listSize(head);
-	for (int a = 0; a < size-1; a++)
+	int a;
+	for (a = 0; a < size-1; a++)
 	{
-		for (int b = 0; b < size-1-a; b++)
+		int b;
+		for (b = 0; b < size-1-a; b++)
 		{
 			Node* i = get(head,b);
 			Node* j = get(head,b+1);

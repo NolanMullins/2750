@@ -113,7 +113,6 @@ List* convertToList(char* file, List* list)
 		{
 			while (!(tmp == '/' && last == '*'))
 			{
-				//printf("%c", tmp);
 				append(line,tmp);
 				last = tmp;
 				tmp = getc(f);
@@ -130,7 +129,7 @@ List* convertToList(char* file, List* list)
 			listAdd(list, createLine(line));
 			flag = 1;
 		}
-		//parse in strings
+		/*parse in strings*/
 		else if (tmp == '"')
 		{
 			char last = tmp;
@@ -144,13 +143,11 @@ List* convertToList(char* file, List* list)
 			}
 			append(line, tmp);
 			listAdd(list, createLine(line));
-			//line[0] = '\0';
 			last = '0';
 		}
 		else
 		{
 			flag = 0;
-			//printf("%d\n", tmp);
 			append(line, tmp);
 		}
 		last = tmp;
@@ -163,7 +160,8 @@ List* convertToList(char* file, List* list)
 void replaceInList(List* list, char* remove, char* place)
 {
 	int size = listSize(list);
-	for (int a = 0; a < size; a++)
+	int a;
+	for (a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(list,a);
 		if (strcmp(remove, d->line)==0)
@@ -178,7 +176,7 @@ void replaceInList(List* list, char* remove, char* place)
 
 /****************************************** Functionality *******************************************/
 
-//return 1 if a class else 0 (Should be called after finding "class")
+/*return 1 if a class else 0 (Should be called after finding "class")*/
 int isClass(List* lines, int startIndex)
 {
 	while (startIndex < listSize(lines))
@@ -192,7 +190,7 @@ int isClass(List* lines, int startIndex)
 	return 0;
 }
 
-//returns 1 if function else 0
+/*returns 1 if function else 0*/
 int isFunction(List* lines, int startIndex)
 {
 	while (startIndex < listSize(lines))
@@ -206,7 +204,7 @@ int isFunction(List* lines, int startIndex)
 	return 0;
 }
 
-// returns 1 if a ( comes before a ) or ;
+/*returns 1 if a ( comes before a ) or ;*/
 int checkForBrk(List* lines, int startIndex)
 {
 	Data* d = (Data*)listGet(lines, startIndex);
@@ -221,16 +219,18 @@ int checkForBrk(List* lines, int startIndex)
 	return 0;
 }
 
-//returns 1 if data type, 0 if not
+/*returns 1 if data type, 0 if not*/
 int isDataType(char* string)
 {
 	char* types[] = {"unsigned", "char", "int", "short", "long", "float", "double", "void", "*", "signed"};
-	for (int a = 0; a < 9; a++)
+	int a;
+	for (a = 0; a < 9; a++)
 		if (strcmp(types[a], string)==0)
 			return 1;
 	return 0;
 }
 
+/* takes a function name and returns a function pointer name*/
 char* createFncPtr(char* fncName)
 {
 	char* ptr = malloc(sizeof(char)*(strlen(fncName)+5+1));
@@ -240,10 +240,12 @@ char* createFncPtr(char* fncName)
 	return ptr;
 }
 
+/* generates a function pointer based on a passed function*/
 List* genFncPtrs(List* functions)
 {
 	List* ptrs = init();
-	for (int a = 0; a < listSize(functions); a++)
+	int a;
+	for (a = 0; a < listSize(functions); a++)
 	{
 		List* fnc = (List*)listGet(functions,a);
 		List* fncPtr = init();
@@ -253,8 +255,6 @@ List* genFncPtrs(List* functions)
 		Data* name = (Data*)listGet(fnc,1);
 		char* fncPtrString = createFncPtr(name->line);
 
-		//char stringType[strlen(type->line)+1];
-		//strcpy(stringType, type->line);
 		listAdd(fncPtr, createLineSafe(type->line));
 		listAdd(fncPtr, createLineSafe(fncPtrString));
 
@@ -271,7 +271,7 @@ List* genFncPtrs(List* functions)
 				depth--;
 		} while (strcmp(")",d->line)!=0 && depth != 0);
 
-		listAdd(fncPtr, createLineSafe(";"));//createLine(";"));
+		listAdd(fncPtr, createLineSafe(";"));
 		free(fncPtrString);
 		listAdd(ptrs, fncPtr);
 	}
@@ -281,14 +281,12 @@ List* genFncPtrs(List* functions)
 char* getFncName(List* fnc, char* className)
 {
 	int a = 1;
-	//printf("%d\n", listSize(fnc));
 	Data* d = (Data*)listGet(fnc, a++);
 	char* oldName = d->line;
 	char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(className)+1));
 	strcpy(newName, className);
 	strcat(newName, oldName);
-	//free(oldName);
-	//append parameters to function name
+	/*append parameters to function name*/
 	d = (Data*)listGet(fnc,a);
 	while (strcmp(")",d->line)!=0)
 	{
@@ -301,13 +299,12 @@ char* getFncName(List* fnc, char* className)
 	return newName;
 }
 
-//struct ptr issue here
+/*struct ptr issue here*/
 List* removeFnc(List* lines, int startIndex)
 {
 	int depth = 0;
 	Data* d = (Data*)listGet(lines,startIndex);
 	List* newList = init();
-	//printf("CALL: %s\n", d->line);
 	while (depth != 1 || strcmp("}",d->line)!=0)
 	{
 		if (strcmp("{",d->line)==0)
@@ -333,11 +330,9 @@ List* removeFnc(List* lines, int startIndex)
 		listAdd(newList, tmp);
 		delLine(old);
 	}
-	//return fnc;
 	return newList;
 }
 
-//struct ptr issue here
 List* parseFunctions(List* lines, int a)
 {
 	List* functions = init();
@@ -348,7 +343,7 @@ List* parseFunctions(List* lines, int a)
 	{
 		if (strcmp("(",d->line)==0 && depth==1)
 		{
-			//Pull the function out
+			/*Pull the function out*/
 			Data* type = (Data*)listGet(lines, a-2);
 			if (strcmp("*", type->line) == 0)
 			{
@@ -366,7 +361,7 @@ List* parseFunctions(List* lines, int a)
 				}
 				else if (strcmp("class", ((Data*)listGet(lines, a-4))->line) == 0 || strcmp("struct", ((Data*)listGet(lines, a-4))->line) == 0)
 				{	
-					//merge data type info into one node
+					/*merge data type info into one node*/
 					Data* tmp = (Data*)listRemove(lines, a-4);
 					Data* name = (Data*)listRemove(lines, a-4);
 					Data* ptr = (Data*)listGet(lines, a-4);
@@ -388,8 +383,6 @@ List* parseFunctions(List* lines, int a)
 			free(nameNode->line);
 			nameNode->line = fncName;
 			listAdd(functions, myList);
-			//for (int a = 0; a < listSize(myList); a++)
-				//printf("%s\n", ((Data*)listGet(myList,a))->line);
 			a-=3;
 		}
 		d = (Data*)listGet(lines,++a);
@@ -415,14 +408,12 @@ List* generateConstructor(List* functions, List* varsToAdd, char* className)
 	strcat(param, "* myS )");
 	listAdd(lines, createLineSafe(param));
 	listAdd(lines, createLineSafe("{"));
-	//TODO
-	/* Need to del initilized vars in function and move the 
-	 * initilization to the contructor
-	 */
-	for (int a = 0; a < listSize(varsToAdd); a++)
+
+	int a;
+	for (a = 0; a < listSize(varsToAdd); a++)
 		listAdd(lines, createLineSafe(((Data*)listGet(varsToAdd, a))->line));
-	//add function pointers
-	for (int a = 0; a < listSize(functions); a++)
+	/*add function pointers*/
+	for (a = 0; a < listSize(functions); a++)
 	{
 		char ass[256];
 		List* fnc = (List*)listGet(functions, a);
@@ -443,8 +434,6 @@ void insertFunctions(List* lines, List* functions, int index)
 	while (listSize(functions)>0)
 	{
 		List* fnc = (List*)listRemove(functions, 0);
-		//printf("%s\n", ((Data*)listGet(fnc,0))->line);
-		//function type not correctly inserted into list
 		while (listSize(fnc)>0)
 		{
 			Data* line = (Data*)listRemove(fnc,0);
@@ -457,8 +446,7 @@ void insertFunctions(List* lines, List* functions, int index)
 
 void insertFunction(List* lines, List* function, int index)
 {
-	//printf("%s\n", ((Data*)listGet(fnc,0))->line);
-	//function type not correctly inserted into list
+	/*function type not correctly inserted into list*/
 	while (listSize(function)>0)
 	{
 		Data* line = (Data*)listRemove(function,0);
@@ -473,7 +461,8 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 	char* type = malloc(sizeof(char)*21);
 	type[0] = '\0';
 	int index = 0;
-	for (int a = indexOfVar-1; a > 0; a--)
+	int a;
+	for (a = indexOfVar-1; a > 0; a--)
 	{
 		Data* d = (Data*)listGet(lines, a);
 		if (strcmp("{", d->line) == 0)
@@ -522,14 +511,15 @@ char* getStructType(List* lines, int indexOfVar, char* varName)
 	int depth = 0;
 	char* type = malloc(sizeof(char)*256);
 	type[0] = '\0';
-	for (int a = indexOfVar-1; a > 0; a--)
+	int a;
+	for (a = indexOfVar-1; a > 0; a--)
 	{
 		Data* d = (Data*)listGet(lines, a);
 		if (strcmp("{", d->line) == 0)
 			depth--;
 		if (strcmp("}", d->line) == 0)
 			depth++;
-		//case struct A myA;
+		/*case struct A myA;*/
 		if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) != 0)
 		{
 			int offset = 2;
@@ -542,7 +532,7 @@ char* getStructType(List* lines, int indexOfVar, char* varName)
 				return type;
 			}
 		}
-		//case struct A myA, myA2;
+		/*case struct A myA, myA2;*/
 		else if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) == 0)
 		{
 			int newA = a;
@@ -565,7 +555,7 @@ char* getStructType(List* lines, int indexOfVar, char* varName)
 	return type;
 }
 
-//will run through a function and correct class initilization
+/*will run through a function and correct class initilization*/
 void functionProcessor(List* lines, List* function, int start)
 {
 	int index = start;
@@ -621,7 +611,7 @@ void functionProcessor(List* lines, List* function, int start)
 				if (strcmp(";", var->line) == 0)
 					continue;
 
-				//insert constuctor
+				/*insert constuctor*/
 				char con[256];
 				strcpy (con, "constructor");
 				strcat(con, type->line);
@@ -644,7 +634,7 @@ void functionProcessor(List* lines, List* function, int start)
 			int myDepth = 0;
 
 			Data* fncName = (Data*)listGet(function, index);
-			//edit function call to include struct type
+			/*edit function call to include struct type*/
 			char* structType = getStructType(lines, index-2, name->line);
 			char newFnc[256];
 			strcpy(newFnc, structType);
@@ -675,7 +665,6 @@ void functionProcessor(List* lines, List* function, int start)
 					free(fncName->line);
 					free(type);
 					fncName->line = strgen(newName);
-					//printf("NEED TO LOOK UP: '%s' Type: '%s'\n", tmp->line, getVarType(lines, c, tmp->line));
 				}
 			} while (strcmp(")", tmp->line) != 0 && depth != 0);
 			char newLine[256];
@@ -690,7 +679,7 @@ void functionProcessor(List* lines, List* function, int start)
 	}
 }
 
-//if the string is an end variable, return 1 else 0
+/*if the string is an end variable, return 1 else 0*/
 int checkEndVar(char* string)
 {
 	if (strcmp(";", string) == 0 || strcmp(")", string) == 0)
@@ -703,20 +692,22 @@ int checkEndVar(char* string)
 int checkFncForClassRef(List* function, List* classVars, char* className)
 {
 	int found[listSize(classVars)];
-	for (int a = 0; a < listSize(classVars); a++)
+	int a;
+	for (a = 0; a < listSize(classVars); a++)
 		found[a] = 0;
 
-	for(int a = 0; a < listSize(function); a++)
+	for(a = 0; a < listSize(function); a++)
 	{
-		//find a data type
+		/*find a data type*/
 		while (++a < listSize(function) && (isDataType(((Data*)listGet(function,a))->line) == 0 || strcmp("*",((Data*)listGet(function,a))->line)==0))
 		{
-			for (int b = 0; b < listSize(classVars); b++)
+			int b;
+			for (b = 0; b < listSize(classVars); b++)
 			{
 				Data* d = (Data*)listGet(function,a);
 				if (found[b] == 0 && strcmp(d->line, (char*)listGet(classVars,b))==0)
 				{
-					//found a line referencing a class variable, need to edit the string
+					/*found a line referencing a class variable, need to edit the string*/
 					char newVar[256];
 					strcpy(newVar, "myStruct999->");
 					strcat(newVar, d->line);
@@ -725,21 +716,22 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 				}
 			}
 		}
-		//move through the typing to find the names
+		/*move through the typing to find the names*/
 		a--;
 		while (++a < listSize(function) && isDataType(((Data*)listGet(function,a))->line) == 1 );
 		a--;
 		Data* myData;
-		//quick check for out of bounds
+		/*quick check for out of bounds*/
 		if (a+1 >= listSize(function))
 			break;
-		//go through all variables attached to typing and if they are a class variable mark them as found
+		/*go through all variables attached to typing and if they are a class variable mark them as found*/
 		do
 		{
 			myData = (Data*)listGet(function,++a);
 			if (checkEndVar(myData->line)==0 && strcmp(",", myData->line) != 0 && isDataType(myData->line) == 0)
 			{
-				for (int b = 0; b < listSize(classVars); b++)
+				int b;
+				for (b = 0; b < listSize(classVars); b++)
 				{
 					if (strcmp(myData->line, listGet(classVars,b))==0)
 						found[b] = 1;
@@ -747,16 +739,16 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 			}
 		}
 		while (a < listSize(function)-1 && checkEndVar(myData->line)==0);
-		//so the top loop can look at the next variable
-		//plz trust this works, dont touch
+		/*so the top loop can look at the next variable
+		//plz trust this works, dont touch*/
 		a--;
 	}
 	
-	int a = 0, depth = 0;
+	a = 0;
+	int depth = 0;
 	Data* d = (Data*)listGet(function,a);
 	while (strcmp(")", d->line) != 0 || --depth != 0)
 	{
-		//if (strcmp(")", d->line) == 0) depth--;
 		if (strcmp("(", d->line) == 0) depth++;
 		d = (Data*)listGet(function,++a);
 	}
@@ -773,25 +765,23 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 
 List* identifyClassVars(List* lines, int start)
 {
-	//Need to identify variables and insert them into this list
+	/*Need to identify variables and insert them into this list*/
 	List* classVars = init();
 	int i = start;
 	while (i<listSize(lines) && strcmp("{", ((Data*)listGet(lines,i++))->line) != 0);
-	//loop through variable lines
+	/*loop through variable lines*/
 	while (i < listSize(lines) && isFunction(lines, ++i) == 0)
 	{
-		//looop through data type strings
+		/*looop through data type strings*/
 		i--;
 		while (++i < listSize(lines) && isDataType(((Data*)listGet(lines,i))->line) == 1);
-		//read in var names
+		/*read in var names*/
 		Data* myData;
 		i--;
 		do
 		{
 			myData = (Data*)listGet(lines,++i);
-			//printf("Looking at: '%s'\n", myData->line);
 			if (!(strcmp(",", myData->line) == 0 || strcmp("=", myData->line) == 0 || strcmp(";", myData->line) == 0))
-				//printf("Class %s Var found: %s\n", ((Data*)listGet(lines,a+1))->line,myData->line);
 				listAdd(classVars, strgen(myData->line));
 		}
 		while (i < listSize(lines) && !(strcmp(";",myData->line) == 0 || strcmp("=", myData->line) == 0));
@@ -802,32 +792,31 @@ List* identifyClassVars(List* lines, int start)
 List* getClassVarsInit(List* lines, int start)
 {
 	List* linesToAdd = init();
-	//Need to identify variables and insert them into this list
+	/*Need to identify variables and insert them into this list*/
 	int i = start;
 	while (i<listSize(lines) && strcmp("{", ((Data*)listGet(lines,i++))->line) != 0);
-	//loop through variable lines
+	/*loop through variable lines*/
 	while (i < listSize(lines) && isFunction(lines, ++i) == 0)
 	{
-		//looop through data type strings
+		/*looop through data type strings*/
 		i--;
 		while (++i < listSize(lines) && isDataType(((Data*)listGet(lines,i))->line) == 1);
-		//read in var names
+		/*read in var names*/
 		Data* myData;
 		i--;
 		do
 		{
 			myData = (Data*)listGet(lines,++i);
-			//printf("Looking at: '%s'\n", myData->line);
 			if (!(strcmp(",", myData->line) == 0 || strcmp("=", myData->line) == 0 || strcmp(";", myData->line) == 0))
 			{
-				//copy var name and remove assignment statement
+				/*copy var name and remove assignment statement*/
 				if (strcmp("=", ((Data*)listGet(lines, i+1))->line) == 0)
 				{
 					char var[256];
 					strcpy(var, "myS->");
 					strcat(var, myData->line);
 					listAdd(linesToAdd, createLineSafe(var));
-					//remove assignment statement
+					/*remove assignment statement*/
 					myData = (Data*)listGet(lines,++i);
 					while (strcmp(",", myData->line) != 0 && strcmp(";", myData->line) != 0)
 					{
@@ -846,53 +835,52 @@ List* getClassVarsInit(List* lines, int start)
 
 void parseFile(List* lines)
 {
-	//int size = listSize(lines);
-	//int depth = 0;
-	for (int a = 0; a < listSize(lines); a++)
+	int a;
+	for (a = 0; a < listSize(lines); a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
-		//parse function here
+		/*parse function here*/
 		if (strcmp("class",d->line)==0 && isClass(lines, a) == 1)
 		{
-			//gather list of class vars
+			/*gather list of class vars*/
 			List* classVars = identifyClassVars(lines, a);
-			//Get variables init'd in a class scope
+			/*Get variables init'd in a class scope*/
 			List* addToCon = getClassVarsInit(lines, a);
-			//after gathering functions, parse them looking for these vars and if so
-			//add a struct className to the params
+			/*after gathering functions, parse them looking for these vars and if so
+			 *add a struct className to the params*/
 			free(d->line);
 			d->line = strgen("struct");
 			if (strcmp("*",((Data*)listGet(lines,a+1))->line) == 0)
 				a++;
 			char* className = ((Data*)listGet(lines,a+1))->line;
 			
-			//parseFunction(lines, &a, &depth);
-			//pull functions out of class
+			/*pull functions out of class*/
 			List* functions = parseFunctions(lines, a);
 
-			//check for class var refs in functions
-			for (int i = 0; i < listSize(functions); i++)
+			/*check for class var refs in functions*/
+			int i;
+			for (i = 0; i < listSize(functions); i++)
 				checkFncForClassRef((List*)listGet(functions, i), classVars, className);
 
-			//Generate function pointers
+			/*Generate function pointers*/
 			List* ptrs = genFncPtrs(functions);
-			//gen contructor
+			/*gen contructor*/
 			List* con = generateConstructor(functions, addToCon, className);
-			//make edits to function
-			for (int i = 0; i < listSize(functions); i++)
+			/*make edits to function*/
+			for (i = 0; i < listSize(functions); i++)
 			{
 				List* fnc = (List*)listGet(functions, i);
 				functionProcessor(lines, fnc, 0);
 			}
-			//move to end of class
+			/*move to end of class*/
 			do 
 			{
 				d = (Data*)listGet(lines,++a);
 			} while (strcmp(d->line, "}")!=0);
-			//insert function pointers into struct
+			/*insert function pointers into struct*/
 			int numPtrs = listSize(ptrs);
 			insertFunctions(lines, ptrs, a);
-			//move to the new end of the class
+			/*move to the new end of the class*/
 			if (numPtrs > 0)
 			{
 				do 
@@ -901,36 +889,36 @@ void parseFile(List* lines)
 				} while (strcmp(d->line, "}")!=0);
 				
 			}
-			a+=2; //account for };
-			//insert the functions
+			a+=2; /*account for };*/
+			/*insert the functions*/
 			int sizeOfFunctions = 0;
-			for (int i = 0; i < listSize(functions); i++)
+			for (i = 0; i < listSize(functions); i++)
 			{
 				List* fnc = (List*)listGet(functions, i);
 				sizeOfFunctions += listSize(fnc);
 			}
 			insertFunctions(lines, functions, a++);
-			//calculate offset before passing functions in, move to location after funtions
-			//generate constructer there
+			/*calculate offset before passing functions in, move to location after funtions
+			 *generate constructer there*/
 			a += sizeOfFunctions-1;
 			int sizeOfCon = listSize(con);
-			//insert constructor
+			/*insert constructor*/
 			insertFunction(lines, con, a);
 			a += sizeOfCon;
 			a-=1;
-			//clear class vars list
+			/*clear class vars list*/
 			listClear(classVars, freeString);
-			//clear other var list
+			/*clear other var list*/
 			listClear(addToCon, delData);
 		}
 		else if (strcmp("class",d->line)==0)
 		{
-			//swap class for struct
+			/*swap class for struct*/
 			free(d->line);
 			d->line = strgen("struct");
 			Data* type = (Data*)listGet(lines, ++a);
 			Data* var = (Data*)listGet(lines, ++a);
-			//generate contructor and insert it into main
+			/*generate contructor and insert it into main*/
 			int i = 0;
 			do 
 			{
@@ -940,7 +928,7 @@ void parseFile(List* lines)
 			{
 				d = (Data*)listGet(lines, i++);
 			} while (strcmp("{", d->line) != 0);
-			//gen contructor
+			/*gen contructor*/
 			char con[256];
 			strcpy (con, "constructor");
 			strcat(con, type->line);
@@ -952,7 +940,6 @@ void parseFile(List* lines)
 		}
 		else if (strcmp("(", d->line) == 0 && isFunction(lines, a) == 1)
 		{
-			//printf("Function found: %s\n", ((Data*)listGet(lines, a-1))->line);
 			functionProcessor(lines, lines,a-2);
 		}
 	}
@@ -973,7 +960,8 @@ void printNewLineFile(FILE* f, int depth, List* lines, int index)
 		if (((Data*)listGet(lines,index))->line[0]=='}')
 			return;
 	fprintf(f,"\n");
-	for (int a = 0; a < depth*4; a++)
+	int a;
+	for (a = 0; a < depth*4; a++)
 				fprintf(f,"%c", ' ');
 }
 
@@ -984,12 +972,12 @@ void outputCode(List* lines, char* filename)
 	char word[256];
 	word[0] = '\0';
 	int a = 0;
-	//gen file name
+	/*gen file name*/
 	while (filename[a] != '\0' && filename[a] != '.')
 		append(word, filename[a++]);
 	strcat(word, ".c");
 	FILE* f = fopen(word, "w");
-	for (int a = 0; a < size; a++)
+	for (a = 0; a < size; a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
 		if (strlen(d->line)>1 && d->line[0] == '/' && d->line[1] == '/')
