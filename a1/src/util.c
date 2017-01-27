@@ -254,7 +254,7 @@ int isDataType(char* string)
 /* takes a function name and returns a function pointer name*/
 char* createFncPtr(char* fncName)
 {
-	char* ptr = malloc(sizeof(char)*(strlen(fncName)+5+1));
+	char* ptr = malloc(sizeof(char)*(strlen(fncName)+6+1));
 	strcpy(ptr, "(*");
 	strcat(ptr, fncName);
 	strcat(ptr, ")");
@@ -306,7 +306,7 @@ char* getFncName(List* fnc, char* className)
 	int a = 1;
 	Data* d = (Data*)listGet(fnc, a++);
 	char* oldName = d->line;
-	char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(className)+1));
+	char* newName = malloc(sizeof(char)*(strlen(oldName)+strlen(className)+64));
 	strcpy(newName, className);
 	strcat(newName, oldName);
 	/*append parameters to function name*/
@@ -606,7 +606,7 @@ void functionProcessor(List* lines, List* function, int start)
 		{
 			
 			free(d->line);
-			char* tmp = malloc(sizeof(char)*7);
+			char* tmp = malloc(sizeof(char)*10);
 			strcpy(tmp, "struct");
 			d->line = tmp;
 
