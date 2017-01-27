@@ -84,7 +84,10 @@ List* convertToList(char* file, List* list)
 {
 	FILE* f = fopen(file, "r");
 	if (f == NULL)
+	{
+		delHead(list);
 		throwError("No File Found");
+	}
 	char tmp = getc(f);
 	char last = '0';
 	int flag = 0;
