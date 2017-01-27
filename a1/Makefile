@@ -1,6 +1,6 @@
 OBJQ1 = main.o list.o util.o
 FLAGS =-Wall -ansi -Iinclude -g 
-EXE = run
+EXE = a1
 
 
 all:$(OBJQ1) 
@@ -8,7 +8,7 @@ all:$(OBJQ1)
 clean:
 	rm $(OBJQ1) $(EXE) a.out
 run:
-	./$(EXE) data/f.cc
+	./$(EXE) data/sample3.cc
 
 test:
 	gcc file.c 
