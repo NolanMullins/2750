@@ -6,7 +6,7 @@ EXE = run
 all:$(OBJQ1) 
 	gcc $(OBJQ1) -o $(EXE) $(FLAGS)
 clean:
-	rm $(OBJQ1) $(EXE) file.c a.out
+	rm $(OBJQ1) $(EXE) a.out
 run:
 	./$(EXE) data/f.cc
 

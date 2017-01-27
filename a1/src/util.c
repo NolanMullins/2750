@@ -3,6 +3,8 @@
 #include <string.h>
 #include <util.h>
 
+#define myStruct "myStruct999"
+
 char* strgen(char* data)
 {
 	char* ptr = malloc(sizeof(char)*(strlen(data)+1));
@@ -666,7 +668,7 @@ void functionProcessor(List* lines, List* function, int start)
 					free(type);
 					fncName->line = strgen(newName);
 				}
-			} while (strcmp(")", tmp->line) != 0 && depth != 0);
+			} while (strcmp(")", tmp->line) != 0 && myDepth != 0);
 			char newLine[256];
 			if (c-index > 2)
 				strcpy(newLine, ", &");
@@ -763,6 +765,98 @@ int checkFncForClassRef(List* function, List* classVars, char* className)
 	return 1;
 }
 
+/* if it is a function returns 1 else 0 */
+int isFncCall(List* fnc, int start)
+{
+	Data* d;
+	int depth = 0;
+	int a = start;
+	do
+	{
+		d = (Data*)listGet(fnc, a);
+		if (strcmp("(", d->line) == 0)
+			depth++;
+		else if (strcmp(")", d->line) == 0)
+			depth--;
+		else if (strcmp(";", d->line) == 0)
+		{
+			if (depth == 0)
+				return 1;
+			else 
+				return 0;
+		}
+		else if (strcmp("{", d->line) == 0)
+			return 0;
+	} while (++a < listSize(fnc));
+	return 0;
+}
+
+void checkForClassMethodRef(List* lines, List* functions, List* function, char* className, int pos)
+{
+	Data* d;
+	int a;
+	for (a = 0; a < listSize(function); a++)
+	{
+		d = (Data*)listGet(function, a);
+		/*initial check for a function call*/
+		if (strcmp("(", d->line) == 0  && isFncCall(function, a) == 1)
+		{
+			Data* name = (Data*)listGet(function, a-1);
+			int nameIndex= a-1;
+			char newName[256];
+			strcpy(newName, className);
+			strcat(newName, name->line);
+			Data* tmp = (Data*)listGet(function, a);
+			do
+			{
+				
+				tmp = (Data*)listGet(function, a++);
+				if (strcmp(",", tmp->line) != 0 && strcmp("&", tmp->line) != 0 && strcmp(";", tmp->line) != 0 && strcmp("(", tmp->line) != 0 && strcmp(")", tmp->line) != 0)
+				{
+					char* var = getVarType(function, a, tmp->line);
+					if (strlen(var) == 0)
+					{
+						free(var);
+						var = getVarType(lines, pos, tmp->line);
+					}
+					if (strlen(var) > 0)
+						append(newName, var[0]);
+					free(var);
+				}
+			} while (strcmp(";", tmp->line) != 0);
+			int b;
+			for (b = 0; b < listSize(functions); b++)
+			{
+				List* myList = (List*)listGet(functions, b);
+				Data* fnc = (Data*)listGet(myList, 1);
+				if (strcmp(fnc->line, newName) == 0)
+				{
+					free(name->line);
+					char newNew[256];
+					strcpy(newNew, myStruct);
+					strcat(newNew, "->");
+					strcat(newNew, newName);
+					name->line = strgen(newNew);
+					/*insert function reference*/
+					int depth = 0;
+					int c = nameIndex;
+					do
+					{
+						tmp = (Data*)listGet(function, c++);
+						if (strcmp(")", tmp->line) == 0)
+							depth--;
+						else if (strcmp("(", tmp->line) == 0)
+							depth++;
+					} while (c < listSize(function) && !(strcmp(")", tmp->line) == 0 && depth == 0));
+					listInsert(function, createLineSafe(myStruct), c-1);
+					listInsert(function, createLineSafe(", "), c-1);
+					break;
+				}
+			}
+		}
+	}
+}
+
 List* identifyClassVars(List* lines, int start)
 {
 	/*Need to identify variables and insert them into this list*/
@@ -857,8 +951,17 @@ void parseFile(List* lines)
 			/*pull functions out of class*/
 			List* functions = parseFunctions(lines, a);
 
-			/*check for class var refs in functions*/
+			/*Check if a method refs another local method in the class, also get the pos of the }*/
+			int index = a;
+			Data* tmp = (Data*)listGet(lines, index);
+			do 
+			{
+				tmp = (Data*)listGet(lines, index++);
+			} while (index < listSize(lines) && strcmp("}", tmp->line) != 0);
 			int i;
+			for (i = 0; i < listSize(functions); i++)
+				checkForClassMethodRef(lines, functions ,(List*)listGet(functions, i), className, index);
+			/*check for class var refs in functions*/
 			for (i = 0; i < listSize(functions); i++)
 				checkFncForClassRef((List*)listGet(functions, i), classVars, className);
 
