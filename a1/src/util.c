@@ -677,7 +677,6 @@ void functionProcessor(List* lines, List* function, int start)
 			strcat(newFnc, fncName->line);
 			free(fncName->line);
 			fncName->line = strgen(newFnc);
-			free(structType);
 
 			Data* tmp = (Data*)listGet(function, c);
 			do 
@@ -710,7 +709,7 @@ void functionProcessor(List* lines, List* function, int start)
 				strcpy(newLine, "&");
 			strcat(newLine, name->line);
 			listInsert(function, createLineSafe(newLine), c);
-			
+			free(structType);
 		}
 	}
 }
