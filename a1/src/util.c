@@ -5,6 +5,7 @@
 
 #define myStruct "myStruct999"
 
+/* generates a malloced string */
 char* strgen(char* data)
 {
 	char* ptr = malloc(sizeof(char)*(strlen(data)+1));
@@ -12,6 +13,7 @@ char* strgen(char* data)
 	return ptr;
 }
 
+/* creates a data line and edits the passed in string */
 Data* createLine(char* data)
 {
 	Data* d = malloc(sizeof(Data));
@@ -22,23 +24,27 @@ Data* createLine(char* data)
 	return d;
 }
 
+/* deletes a line*/
 void delLine(Data* data)
 {
 	free(data->line);
 	free(data);
 }
 
+/* will del a Data* type var*/
 void delData(void* data)
 {
 	free(((Data*)data)->line);
 	free((Data*)data);
 }
 
+/* frees a string *used for passing in to linked list*/
 void freeString(void* data)
 {
 	free((char*)data);
 }
 
+/* does the same as creates a line but does not edit the passed in string*/
 Data* createLineSafe(char* data)
 {
 	Data* d = malloc(sizeof(Data));
@@ -48,6 +54,7 @@ Data* createLineSafe(char* data)
 	return d;
 }
 
+/* appends a char to a string*/
 char* append(char* line, char c)
 {
 	int len = strlen(line);
@@ -56,6 +63,7 @@ char* append(char* line, char c)
 	return line;
 }
 
+/* gets the next char ina file without editing the buffer*/
 char getNext(FILE* f)
 {
 	char next = getc(f);
@@ -63,6 +71,7 @@ char getNext(FILE* f)
 	return next;
 }
 
+/* checks is tmp is an operator*/
 int isOperator(char tmp)
 {
 	if (tmp == '=' || tmp == '<' || tmp == '>' || tmp == '+' || tmp == '-' || tmp == '/' || tmp == '*')
@@ -70,6 +79,7 @@ int isOperator(char tmp)
 	return 0;
 }
 
+/* converts a file to a list*/
 List* convertToList(char* file, List* list)
 {
 	FILE* f = fopen(file, "r");
@@ -82,6 +92,7 @@ List* convertToList(char* file, List* list)
 	line[0] = '\0';
 	while (tmp != EOF)
 	{
+		/* white space = new line*/
 		if (tmp == '\t' || tmp == ' ' || tmp == '\n' || tmp == '\r')
 		{
 			if (flag!=1)
@@ -91,6 +102,7 @@ List* convertToList(char* file, List* list)
 				flag = 1;
 			}
 		}
+		/* these marks = new line*/
 		else if (tmp == ';' || tmp == '(' || tmp == ')' || tmp == '{' || tmp == '}' || tmp == ',' || tmp == '.' || tmp == '&')
 		{
 			if (flag == 0)
@@ -100,6 +112,7 @@ List* convertToList(char* file, List* list)
 			line[0] = '\0';
 			flag = 1;
 		}
+		/* read in a comment */
 		else if (tmp == '/' && last == '/')
 		{
 			while (!(tmp == '\n' || tmp == '\r'))
@@ -111,6 +124,7 @@ List* convertToList(char* file, List* list)
 			flag = 1;
 			listAdd(list, createLine(line));
 		}
+		/* read in a comment */
 		else if (tmp == '*' && last == '/')
 		{
 			while (!(tmp == '/' && last == '*'))
@@ -121,6 +135,7 @@ List* convertToList(char* file, List* list)
 			}
 			append(line, tmp);
 		}
+		/* deal with ptrs */
 		else if (!(tmp == '/' && (getNext(f) == '*' || getNext(f) == '/')) && isOperator(tmp) == 1)
 		{
 			if (strlen(line)>0)
@@ -159,6 +174,7 @@ List* convertToList(char* file, List* list)
 	return list;
 } 
 
+/* search through a list and replace remove with place strings*/
 void replaceInList(List* list, char* remove, char* place)
 {
 	int size = listSize(list);
@@ -247,6 +263,7 @@ List* genFncPtrs(List* functions)
 {
 	List* ptrs = init();
 	int a;
+	/* loop through the functions and generate fnc ptr declerations*/
 	for (a = 0; a < listSize(functions); a++)
 	{
 		List* fnc = (List*)listGet(functions,a);
@@ -280,6 +297,7 @@ List* genFncPtrs(List* functions)
 	return ptrs;
 }
 
+/* generate the name of a function */
 char* getFncName(List* fnc, char* className)
 {
 	int a = 1;
@@ -301,12 +319,13 @@ char* getFncName(List* fnc, char* className)
 	return newName;
 }
 
-/*struct ptr issue here*/
+/* remove a function out of the main list and returns it in a seperate one*/
 List* removeFnc(List* lines, int startIndex)
 {
 	int depth = 0;
 	Data* d = (Data*)listGet(lines,startIndex);
 	List* newList = init();
+	/* loop while it hasnt hit the end of the function */
 	while (depth != 1 || strcmp("}",d->line)!=0)
 	{
 		if (strcmp("{",d->line)==0)
@@ -325,6 +344,7 @@ List* removeFnc(List* lines, int startIndex)
 	listAdd(newList, tmp);
 	delLine(old);
 	d = (Data*)listGet(lines,startIndex);
+	/* account for the ; after the }*/
 	if (strcmp(";", d->line) == 0)
 	{
 		old = (Data*)listRemove(lines, startIndex);
@@ -335,6 +355,7 @@ List* removeFnc(List* lines, int startIndex)
 	return newList;
 }
 
+/* parse functions in a class */
 List* parseFunctions(List* lines, int a)
 {
 	List* functions = init();
@@ -396,6 +417,7 @@ List* parseFunctions(List* lines, int a)
 	return functions;
 }
 
+/* generates a contructor for a function*/
 List* generateConstructor(List* functions, List* varsToAdd, char* className)
 {
 	List* lines = init();
@@ -431,6 +453,7 @@ List* generateConstructor(List* functions, List* varsToAdd, char* className)
 	return lines;
 }
 
+/*insert multiple functions into the main list ***will destroy the passed in function lists*/
 void insertFunctions(List* lines, List* functions, int index)
 {
 	while (listSize(functions)>0)
@@ -445,7 +468,7 @@ void insertFunctions(List* lines, List* functions, int index)
 	}
 	delHead(functions);
 }
-
+/*insert a single function into the main list ***will destroy the passed in function list*/
 void insertFunction(List* lines, List* function, int index)
 {
 	/*function type not correctly inserted into list*/
@@ -457,6 +480,7 @@ void insertFunction(List* lines, List* function, int index)
 	delHead(function);
 }
 
+/* will search through a list look for the type of a passed in var*/
 char* getVarType(List* lines, int indexOfVar, char* varName)
 {
 	int depth = 0;
@@ -464,6 +488,7 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 	type[0] = '\0';
 	int index = 0;
 	int a;
+	/* loop back from the position of the var*/
 	for (a = indexOfVar-1; a > 0; a--)
 	{
 		Data* d = (Data*)listGet(lines, a);
@@ -471,6 +496,7 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 			depth--;
 		if (strcmp("}", d->line) == 0)
 			depth++;
+		/* if it found a data type before the ref to the var in question */
 		if (strcmp(varName, d->line) == 0 && isDataType(((Data*)listGet(lines, a-1))->line) == 1)
 		{
 			d = (Data*)listGet(lines, --a);
@@ -483,6 +509,7 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 			type[index] = '\0';
 			return type;
 		}
+		/* if it found a multi decleration before the ref to the var in question */
 		else if (strcmp(varName, d->line) == 0 && strcmp(",",((Data*)listGet(lines, a-1))->line) == 0)
 		{
 			int newA = a;
@@ -508,6 +535,7 @@ char* getVarType(List* lines, int indexOfVar, char* varName)
 	return type;
 }
 
+/* will return the type of struct */
 char* getStructType(List* lines, int indexOfVar, char* varName)
 {
 	int depth = 0;
@@ -570,6 +598,7 @@ void functionProcessor(List* lines, List* function, int start)
 		else if (strcmp("}", d->line) == 0)
 			if (--depth == 0)
 				return;
+		/* if a class has been found */
 		if (strcmp("class", d->line) == 0)
 		{
 			
@@ -582,6 +611,7 @@ void functionProcessor(List* lines, List* function, int start)
 			Data* var = (Data*)listGet(function, index);;
 			int refIndex = index;
 			int isPtr = 0;
+			/* move through the decleration and take in data to gen the constructor */
 			do
 			{
 				index = refIndex++;
@@ -629,6 +659,7 @@ void functionProcessor(List* lines, List* function, int start)
 				
 			} while (strcmp(";", var->line) != 0);
 		}
+		/* found a class accessing a var or function */
 		if ((strcmp(".", d->line) == 0 || strcmp("->", d->line) == 0) && checkForBrk(lines, index-1) == 1)
 		{
 			Data* name = (Data*)listGet(function, index-2);
@@ -691,6 +722,7 @@ int checkEndVar(char* string)
 	return 0;
 }
 
+/* checks for a function referencing a class var*/
 int checkFncForClassRef(List* function, List* classVars, char* className)
 {
 	int found[listSize(classVars)];
@@ -791,6 +823,7 @@ int isFncCall(List* fnc, int start)
 	return 0;
 }
 
+/* will look for local method refs in a class method */
 void checkForClassMethodRef(List* lines, List* functions, List* function, char* className, int pos)
 {
 	Data* d;
@@ -807,6 +840,7 @@ void checkForClassMethodRef(List* lines, List* functions, List* function, char* 
 			strcpy(newName, className);
 			strcat(newName, name->line);
 			Data* tmp = (Data*)listGet(function, a);
+			/* attempt to create function name based on params */
 			do
 			{
 				
@@ -825,6 +859,7 @@ void checkForClassMethodRef(List* lines, List* functions, List* function, char* 
 				}
 			} while (strcmp(";", tmp->line) != 0);
 			int b;
+			/* look to see if the function is a local fnc */
 			for (b = 0; b < listSize(functions); b++)
 			{
 				List* myList = (List*)listGet(functions, b);
@@ -857,6 +892,7 @@ void checkForClassMethodRef(List* lines, List* functions, List* function, char* 
 	}
 }
 
+/* gens a list of a class var in a class */
 List* identifyClassVars(List* lines, int start)
 {
 	/*Need to identify variables and insert them into this list*/
@@ -883,6 +919,7 @@ List* identifyClassVars(List* lines, int start)
 	return classVars;
 }
 
+/* looks for class variables being initialized upon decleration and fixes them */
 List* getClassVarsInit(List* lines, int start)
 {
 	List* linesToAdd = init();
@@ -927,6 +964,7 @@ List* getClassVarsInit(List* lines, int start)
 	return linesToAdd;
 }
 
+/* will parse through a file and turn it from c++ to c */
 void parseFile(List* lines)
 {
 	int a;
@@ -1050,6 +1088,7 @@ void parseFile(List* lines)
 
 /******************************************* OUTPUT functions ***********************************************************/
 
+/* prints a new line to a file with given indentation */
 void printNewLineFile(FILE* f, int depth, List* lines, int index)
 {
 	
@@ -1068,6 +1107,7 @@ void printNewLineFile(FILE* f, int depth, List* lines, int index)
 				fprintf(f,"%c", ' ');
 }
 
+/* output code to filename -.cc +.c */
 void outputCode(List* lines, char* filename)
 {
 	int size = listSize(lines);
@@ -1100,6 +1140,7 @@ void outputCode(List* lines, char* filename)
 			fprintf(f,"%s", d->line);
 			continue;
 		}
+		/* FORMATING SLDGNLSGN */
 		if (a < size-1 && strcmp(";",((Data*)listGet(lines,a+1))->line)==0)
 			fprintf(f,"%s", d->line);
 		else if (strcmp(d->line, "*") == 0)
