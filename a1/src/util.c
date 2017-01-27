@@ -1166,4 +1166,6 @@ void outputCode(List* lines, char* filename)
 		if (strcmp(";",d->line)==0)
 			printNewLineFile(f,depth, lines, a);
 	}
+
+	fclose(f);
 }
