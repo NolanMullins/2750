@@ -12,8 +12,10 @@ in order to edit the code to c. The program will also be able to handle scoping 
 and link class variables to its methods after they get pulled out and linked to a struct.
 
 Known issues
- - Cant overload methods outside of the class
- - Class methods cant accept class variable types
+ - methods cant accept class variable types
+     - ie int fnc (Class A b) {}
+ - methods cant accept class variables as it messes with the naming
+     - ie add (myC.a, myC.b) is a no go
 
 ***Instructions - compile***
 type: make

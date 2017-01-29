@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int add (float a, float b);
+
 int add (int a, int b)
 {
    return a+b;
