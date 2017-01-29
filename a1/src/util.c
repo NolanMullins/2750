@@ -1,3 +1,8 @@
+/* 
+ * Nolan Mullins 0939720
+ * assigment utilities for a1
+ */
+
 #include <stdio.h>
 #include <list.h>
 #include <string.h>
@@ -314,6 +319,27 @@ char* getFncName(List* fnc, char* className)
 	while (strcmp(")",d->line)!=0)
 	{
 		d = (Data*)listGet(fnc,++a);
+		if (isDataType(d->line) == 1 && strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0 && strcmp("*",d->line)!=0)
+		{
+			newName = append(newName, d->line[0]);
+		}
+	}
+	return newName;
+}
+
+/* generate the name of a function outside of a class*/
+char* getFncName2(List* lines, int index)
+{
+	int a = index;
+	Data* d = (Data*)listGet(lines, a++);
+	char* oldName = d->line;
+	char* newName = malloc(sizeof(char)*(strlen(oldName)+64));
+	strcpy(newName, oldName);
+	/*append parameters to function name*/
+	d = (Data*)listGet(lines,a);
+	while (strcmp(")",d->line)!=0)
+	{
+		d = (Data*)listGet(lines,++a);
 		if (isDataType(d->line) == 1 && strcmp(",",d->line)!=0 && strcmp(")",d->line)!=0 && strcmp("*",d->line)!=0)
 		{
 			newName = append(newName, d->line[0]);
@@ -970,9 +996,16 @@ List* getClassVarsInit(List* lines, int start)
 void parseFile(List* lines)
 {
 	int a;
+	int depth = 0;
+	List* fncs = init();
 	for (a = 0; a < listSize(lines); a++)
 	{
 		Data* d = (Data*)listGet(lines,a);
+		if (strcmp("{", d->line) == 0)
+			depth++;
+		else if (strcmp("}", d->line) == 0)
+			depth--;
+
 		/*parse function here*/
 		if (strcmp("class",d->line)==0 && isClass(lines, a) == 1)
 		{
@@ -1083,9 +1116,66 @@ void parseFile(List* lines)
 		}
 		else if (strcmp("(", d->line) == 0 && isFunction(lines, a) == 1)
 		{
+			Data* name = (Data*)listGet(lines, a-1);
+			if (strcmp("main", name->line) != 0)
+			{
+				char* newName = getFncName2(lines, a-1);
+				free(name->line);
+				name->line = newName;
+				listAdd(fncs, strgen(newName));
+			}
 			functionProcessor(lines, lines,a-2);
 		}
+		/* function prototype*/
+		else if (strcmp("(", d->line) == 0 && depth == 0)
+		{
+			Data* name = (Data*)listGet(lines, a-1);
+			if (strcmp("main", name->line) != 0)
+			{
+				char* newName = getFncName2(lines, a-1);
+				free(name->line);
+				name->line = newName;
+				listAdd(fncs, strgen(newName));
+			}
+		}
+		/* function calls */
+		else if (strcmp("(", d->line) == 0)
+		{
+			Data* name = (Data*)listGet(lines, a-1);
+			if (strcmp("printf", name->line)==0)
+				continue;
+			char* newName = malloc(sizeof(char)*((strlen(name->line)+64)));
+			strcpy(newName, name->line);
+			/* attempt to create its new name */
+			int tmpDepth = 0;
+			while (!(strcmp(")", d->line) == 0 && tmpDepth == 0))
+			{
+				d = (Data*)listGet(lines, a++);
+				if (strcmp(")", d->line) == 0)
+					tmpDepth--;
+				else if (strcmp("(", d->line) == 0)
+					tmpDepth++;
+				else if (strcmp(",", d->line) != 0)
+				{
+					char* tmp = getVarType(lines, a-1, d->line);
+					strcat(newName, tmp);
+					free(tmp);
+				}
+			}
+			int i;
+			/* check if the new name is in the list, if so replace the old name */
+			for (i = 0; i < listSize(fncs); i++)
+			{
+				if (strcmp(newName, (char*)listGet(fncs,i)) == 0)
+				{
+					free(name->line);
+					name->line = strgen(newName);
+				}
+			}
+			free(newName);
+		}	
 	}
+	listClear(fncs, freeString);
 }
 
 /******************************************* OUTPUT functions ***********************************************************/

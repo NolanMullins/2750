@@ -1,49 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-class C
+int add (int a, int b)
 {
-	int a;
-};
-
-struct mystruct {
-   float f;
-   double d;
-   long l;
-   short s;
-   int i;
-   char c;
-};
-
-class
-B {
-   float
-      abc = 1.2, cba = 1;
-
-   struct mystruct *  method()
-   {
-   struct mystruct *ptr;
-      int z = 3;
-      z++;
-      printf("output should be 4 1.200000 : %d %f\n", z, abc);
-
-      ptr = malloc(sizeof(struct mystruct));
-      return(ptr);
-   };
-   void string1(char str[]) {
-      printf("output should be abcd: %s\n", str);
-   }
-   void string2(char *str) {
-      printf("output should be efgh: %s\n", str);
-   }
-};
-
+   return a+b;
+}
+float add (float a, float b)
+{
+   return a + b;
+}
+//tmp
+int test (float a, float b);
 /*this is a test
  * 
  */
  // class
 int main()
 {
-	class B myB;
-	printf("class");
+	int a=1,b=1;
+   float c=2,d=2;
+   add(a,b);
+   add(c,d);
+   printf("%d %lf\n",add(a,b),add(c,d) );
 }

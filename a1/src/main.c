@@ -9,8 +9,10 @@ int main(int argc, char* argv[])
 		throwError("No file provided... exiting");
 
 	List* myList = init();
+	/* convert the file to a list */
 	myList = convertToList(argv[1], myList);
 
+	/* convert it from c++ to c */
 	parseFile(myList);
 
 	outputCode(myList, argv[1]);
