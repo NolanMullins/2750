@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+class C
+{
+	int a;
+};
+
+class B
+{
+int a,b, c;
+   void seta(int val ) {
+      a = val;
+   }
+   void setb(int val ){
+      b = val;
+   }
+   void setc (int val) {
+      c = val;
+   }
+   int geta() {
+      return(a);
+   }
+   int getb (){
+      return( b);
+   }
+   int getc () {
+      return( c );
+   }
+   void math() {
+   int result;
+   int c = 1;
+      result = a + b* c /a;
+   }
+};
+
+/*this is a test
+ * 
+ */
+ // class
+int main()
+{
+	class B myB;
+	printf("class");
+}

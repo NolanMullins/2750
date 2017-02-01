@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+class B {
+    int a,b;
+    int add(int b, int c) {
+        if (b == '\\'){
+            printf("class B {\"\n"); // another comment //
+        }
+        return (b+c);
+        /*
+        class B {
+            int a,b;
+            int add(int b, int c) {
+            if (b == '\\'){
+                printf("class B {\"\n"); // another comment //
+        */
+    }
+}
+
+int main()
+{
+    class B test;
+    test.add(5,4);
+}
