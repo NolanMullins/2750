@@ -19,7 +19,7 @@ char* append(char* line, char c)
 	return line;
 }
 
-int fileExists(char* fileName)
+int fileNotFound(char* fileName)
 {
 	FILE* f = fopen(fileName, "r");
 	if (f == NULL)
@@ -47,7 +47,10 @@ int cmp(char* name, char* line)
 
 int userExists(char* name, char* file)
 {
-	FILE* f = fopen(file, "r");
+	char tmp[256];
+	strcpy(tmp, "users/");
+	strcat(tmp, file);
+	FILE* f = fopen(tmp, "r");
 	if (f == NULL)
 		return 0;
 	char line[256];
@@ -66,10 +69,63 @@ void createFile(char* fileName)
 	fclose(f);
 }
 
+int sizeOfPost(struct userPost *st)
+{
+	int numLinePost = 3;
+	int a;
+	int size = strlen(st->text);
+	for (a = 0; a < size; a++)
+		if (st->text[a] == '\n' || st->text[a] == '\r')
+			numLinePost++;
+	return numLinePost;
+}
 
+void printStruct(FILE* stream, FILE* data, struct userPost *st, int end)
+{
+	fprintf(stream, "%s\n", st->username);
+	fprintf(stream, "%s\n", st->date);
+	fprintf(stream, "%s\n", st->text);
+	fprintf(data, "%d\n", end);
+}
+
+/* Lib functions */
 int updateStream(struct userPost *st)
 {
-	printf("Updating\n");
+	char stream[256];
+	char data[256];
+	strcpy(stream, "msg/");
+	strcat(stream, st->streamname);
+	strcat(stream, "_stream");
+	strcpy(data, "msg/");
+	strcat(data, st->streamname);
+	strcat(data, "_data");
+
+	FILE *streamF, *dataF;
+	if (userExists(st->username, st->streamname) == 0)
+		return -1;
+	if (fileNotFound(stream))
+	{
+		streamF = fopen(stream, "w");
+		dataF = fopen(data, "w");
+		if (streamF == NULL)
+			printf("err: %s\n", strerror(errno));
+		printStruct(streamF, dataF, st,sizeOfPost(st)-1);
+		fclose(streamF);
+		fclose(dataF);
+		return 1;
+	}
+	streamF = fopen(stream, "a+");
+	dataF = fopen(data, "a");
+	int numLines = 0;
+	char line[256];
+	/* find number of lines in file */
+	while(fgets(line, 255, streamF) != NULL) numLines++;
+	/* find number of lines in this post */
+	int postLines = sizeOfPost(st);
+	printStruct(streamF, dataF, st, numLines+postLines-1);
+	
+	fclose(streamF);
+	fclose(dataF);
 	return 0;
 }
 
@@ -87,7 +143,7 @@ int addUser(char* username, char* list)
 			strcpy(tmp, "users/");
 			strcat(tmp, stream);
 			FILE* f;
-			if (fileExists(tmp))
+			if (fileNotFound(tmp))
 			{
 				f = fopen(tmp, "w");
 				if (f == NULL)
@@ -95,7 +151,7 @@ int addUser(char* username, char* list)
 			}
 			else
 				f = fopen(tmp, "a");
-			if (userExists(username, tmp))
+			if (userExists(username, stream))
 			{
 				printf("User already in file %s\n", stream);
 			}
@@ -124,6 +180,14 @@ int removeUser(char* username, char* list)
 
 int main()
 {
-	addUser("Ryan", "cats,dogs");
+	/* addUser("Ryan", "cats,dogs"); */
+	struct userPost st;
+	st.username = "Rhys";
+	st.streamname = "cats";
+	st.date = "todo";
+	st.text = "hi\nryan";
+	int sts = updateStream(&st);
+	if (sts == -1)
+		printf("User Not Found\n");
 	return 0;
 }
