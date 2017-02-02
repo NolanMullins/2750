@@ -4,7 +4,7 @@
  */
 
 #include <stdio.h>
-#include <list.h>
+#include "list.h"
 #include <string.h>
 #include <util.h>
 

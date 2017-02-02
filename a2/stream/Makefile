@@ -1,4 +1,4 @@
-OBJQ1 = stream.o
+OBJQ1 = stream.o list.o
 FLAGS =-Wall -ansi -Iinclude -g 
 EXE = stream
 
@@ -13,5 +13,7 @@ run:
 test:
 	gcc file.c 
 
-stream.o: stream.c
-	gcc -c stream.c $(FLAGS)
+stream.o: src/stream.c
+	gcc -c src/stream.c $(FLAGS)
+list.o: src/list.c include/list.h
+	gcc -c src/list.c $(FLAGS)

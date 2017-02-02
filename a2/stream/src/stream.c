@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "list.h"
 
 struct userPost {
 	char* username;
@@ -17,6 +18,19 @@ char* append(char* line, char c)
 	line[len] = c;
 	line[len+1] = '\0';
 	return line;
+}
+
+/* generates a malloced string */
+char* strgen(char* data)
+{
+	char* ptr = malloc(sizeof(char)*(strlen(data)+1));
+	strcpy(ptr, data);
+	return ptr;
+}
+
+void freeString(void* data)
+{
+	free((char*)data);
 }
 
 int fileNotFound(char* fileName)
@@ -57,8 +71,12 @@ int userExists(char* name, char* file)
 	while (fgets(line, 255, f) != NULL)
 	{
 		if (cmp(name, line))
+		{
+			fclose(f);
 			return 1;
+		}
 	}
+	fclose(f);
 	return 0;
 }
 
@@ -174,20 +192,75 @@ int addUser(char* username, char* list)
 
 int removeUser(char* username, char* list)
 {
-	printf("Removing\n");
+	char stream[256];
+	int a = 0;
+	stream[0] = '\0';
+	while (1)
+	{
+		if (list[a] == ',' || list[a] == '\0')
+		{
+			/* list function */
+			char tmp[256];
+			strcpy(tmp, "users/");
+			strcat(tmp, stream);
+			FILE* f;
+			if (fileNotFound(tmp))
+			{
+				*stream = 0;
+				if (list[a] == '\0')
+					break;
+				continue;
+			}
+			f = fopen(tmp, "r");
+			/* if the user exists read in the file and remove their line */
+			if (userExists(username, stream))
+			{
+				char line[256];
+				List* lines = init();
+				while (fgets(line, 255, f) != NULL)
+				{
+					if (strlen(line) > 0 && cmp(username, line) == 0)
+					{
+						listAdd(lines, strgen(line));
+					}
+				}
+				fclose(f);
+				f = fopen(tmp, "w");
+				int size = listSize(lines);
+				int b;
+				for (b = 0; b < size; b++)
+					if (((char*)listGet(lines, b))[0] != '\n')
+						fprintf(f, "%s", (char*)listGet(lines, b));
+				lines = listClear(lines, freeString);
+				fclose(f);
+			}
+			else
+				fclose(f);
+			*stream = 0;
+			if (list[a] == '\0')
+				break;
+		}
+		else
+			append(stream, list[a]);
+		a++;
+	}
+	return 0;
 	return 0;
 }
 
 int main()
 {
-	/* addUser("Ryan", "cats,dogs"); */
-	struct userPost st;
+	/*addUser("Nolan", "cats,dogs"); 
+	addUser("Ryan", "cats,dogs"); 
+	addUser("Rhys", "cats,dogs"); */
+	/*struct userPost st;
 	st.username = "Rhys";
 	st.streamname = "cats";
 	st.date = "todo";
-	st.text = "hi\nryan";
-	int sts = updateStream(&st);
+	st.text = "hi\nryan";*/
+	/*int sts = updateStream(&st);
 	if (sts == -1)
-		printf("User Not Found\n");
+		printf("User Not Found\n");*/
+	removeUser("Ryan", "cats");
 	return 0;
 }
