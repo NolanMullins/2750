@@ -120,6 +120,18 @@ List* convertToList(char* file, List* list)
 			line[0] = '\0';
 			flag = 1;
 		}
+		else if (tmp == '[')
+		{
+			listAdd(list, createLine(line));
+			do
+			{
+				append(line, tmp);
+				tmp = getc(f);
+			} while (tmp != ']');
+			append(line, tmp);
+			listAdd(list, createLine(line));
+			flag = 1;
+		}
 		/* read in a comment */
 		else if (tmp == '/' && last == '/')
 		{

@@ -1,25 +1,50 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h	>
-class String
-{
-	char * cpy(char* old)
+#include <stdlib.h>
+
+/* need to build stream lib */
+struct userPost {
+	char* username;
+	char* streamname;
+	char* date;
+	char* text;
+};
+
+class PostEntry {
+	struct userPost post;
+	char input[256];
+	void readInput()
 	{
-		char* newS = malloc(sizeof(char)*(strlen(old)+1));
-		strcpy(newS, old);
-		return newS;
+		/* read into input */
+		return;
+	}
+	void getTimeDate(char* time)
+	{
+		time = NULL;
+	}
+	void formatEntry()
+	{
+		/* put data into struct */
+		char curTime[256];
+		getTimeDate(curTime);
+		post.date = curTime;
+		return;
+	}
+	int submitPost()
+	{
+		/* submit the post to the stream lib */
+		return 0;
 	}
 };
 
 int main(int argc, char* argv[])
 {
-	class String s;
-	char* tmp = malloc(sizeof(char)*64);
-	char* tmp2;
-	strcpy(tmp, "test");
-	tmp2 = s.cpy(tmp);
-	printf("%s\n", tmp2);
-	free(tmp);
-	free(tmp2);
+	class PostEntry entry;
+	entry.readInput();
+	entry.formatEntry();
+	/*char curTime[256];
+	entry.getTimeDate(curTime);*/
+	entry.formatEntry();
+	entry.submitPost();
 	return 0;
 }
