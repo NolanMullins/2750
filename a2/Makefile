@@ -7,8 +7,10 @@ FLAGS = -Wall -ansi -Iinclude -g
 EXE = a2
 
 #Build and compile the c++ file
-conv: post/$(POST).cc runC2c
+conv: echo post/$(POST).cc runC2c
 	gcc post/$(POST).c $(FLAGS) -o $(EXE)
+echo:
+	@echo "\n*************************\n* Building Post program *\n*************************\n"
 runC2c: buildC2c
 	cp post/$(POST).cc C2c/$(POST).cc -f \
 	&& cd C2c && ./C2c $(POST).cc && make clean && rm $(POST).cc \
@@ -19,5 +21,6 @@ buildC2c:
 
 clean:
 	rm post/$(POST).c $(EXE)
-	
+
+
 	
