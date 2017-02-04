@@ -1249,6 +1249,10 @@ void outputCode(List* lines, char* filename)
 			fprintf(f,"%s", d->line);
 		else if (strcmp(d->line, "*") == 0)
 			fprintf(f,"%s", d->line);
+		else if (a < size-1 && strcmp("&", d->line) == 0 && strcmp("&",((Data*)listGet(lines,a+1))->line)==0)
+			fprintf(f, "%s%s ", d->line, ((Data*)listGet(lines,++a))->line);
+		else if (a < size-1 && strcmp("!", d->line) == 0 && strcmp("=",((Data*)listGet(lines,a+1))->line)==0)
+			fprintf(f, "%s%s ", d->line, ((Data*)listGet(lines,++a))->line);
 		else if (a < size-1 && strcmp(".",((Data*)listGet(lines,a+1))->line)==0)
 			fprintf(f, "%s", d->line);
 		else if (strcmp(".", d->line) == 0)

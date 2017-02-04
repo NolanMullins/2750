@@ -12,10 +12,17 @@ struct userPost {
 
 class PostEntry {
 	struct userPost post;
-	char input[256];
+	char stream[256];
+	char text[64][256];
+	int numLine;
 	void readInput()
 	{
-		/* read into input */
+		
+		printf("stream: ");
+		fgets(stream, 255, stdin);
+		int a = 0;
+		while (a < 64 && fgets(text[a++], 255, stdin) != NULL);
+		numLine = a-1;
 		return;
 	}
 	void getTimeDate(char* time)
@@ -39,6 +46,12 @@ class PostEntry {
 
 int main(int argc, char* argv[])
 {
+	if (argc < 1)
+		printf("No username\n");
+	int a;
+	for (a=0; a < argc; a++)
+		printf("%s\n", argv[a]);
+	
 	class PostEntry entry;
 	entry.readInput();
 	entry.formatEntry();
