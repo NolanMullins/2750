@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /* need to build stream lib */
 struct userPost {
@@ -13,48 +14,79 @@ struct userPost {
 class PostEntry {
 	struct userPost post;
 	char stream[256];
-	char text[64][256];
+	char textArr[64][256];
 	int numLine;
-	void readInput()
+	void readInput(char* name)
 	{
-		
+		post.username = name;
 		printf("stream: ");
 		fgets(stream, 255, stdin);
 		int a = 0;
-		while (a < 64 && fgets(text[a++], 255, stdin) != NULL);
+		while (stream[a++] != '\0')
+			if (stream[a-1] == '\n')
+				stream[a-1] = '\0';
+		a=0;
+		printf("text: ");
+		while (a < 64 && fgets(textArr[a++], 255, stdin) != NULL);
 		numLine = a-1;
 		return;
 	}
-	void getTimeDate(char* time)
+	void getTimeDate(char* timeString)
 	{
-		time = NULL;
+		time_t timeT;
+		struct tm* info;
+		time(&timeT);
+		info = localtime(&timeT);
+
+		sprintf(timeString, "%d/%d/%d:%d/%d/%d", info->tm_sec, info->tm_min, info->tm_hour
+			, info->tm_mday, info->tm_mon+1, info->tm_year+1900);
 	}
 	void formatEntry()
 	{
 		/* put data into struct */
-		char curTime[256];
+		char* curTime = malloc(sizeof(char)*256);
 		getTimeDate(curTime);
 		post.date = curTime;
+		post.streamname = stream;
+		int size = numLine*256;
+		char* text = malloc(sizeof(char)*size);
+		strcpy(text, textArr[0]);
+		int a;
+		for (a = 1; a < numLine; a++)
+			strcat(text, textArr[a]);
+		post.text = text;
 		return;
 	}
 	int submitPost()
 	{
 		/* submit the post to the stream lib */
+		printf("\nSubmitting post\n\n");
+		printf("%s\n", post.username);
+		printf("%s\n", post.streamname);
+		printf("%s\n", post.date);
+		printf("%s", post.text);
+
+		free(post.text);
+		free(post.date);
 		return 0;
 	}
 };
 
 int main(int argc, char* argv[])
 {
-	if (argc < 1)
+	if (argc < 2)
 		printf("No username\n");
 	int a;
-	for (a=0; a < argc; a++)
-		printf("%s\n", argv[a]);
-	
+	char name[256];
+	strcpy(name, argv[1]);
+	for (a=2; a < argc; a++)
+	{
+		strcat(name, " ");
+		strcat(name, argv[a]);
+	}
+
 	class PostEntry entry;
-	entry.readInput();
-	entry.formatEntry();
+	entry.readInput(name);
 	/*char curTime[256];
 	entry.getTimeDate(curTime);*/
 	entry.formatEntry();

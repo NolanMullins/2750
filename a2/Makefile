@@ -16,6 +16,9 @@ runC2c: buildC2c
 	&& cd C2c && ./C2c $(POST).cc && make clean && rm $(POST).cc \
 	&& cd .. && mv C2c/$(POST).c postProgram/$(POST).c
 
+gcc:
+	gcc postProgram/$(POST).c $(FLAGS) -o $(EXE)
+
 buildC2c:
 	cd C2c && make && cd ..
 
