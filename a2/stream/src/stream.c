@@ -3,13 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include "list.h"
-
-struct userPost {
-	char* username;
-	char* streamname;
-	char* date;
-	char* text;
-};
+#include "stream.h"
 
 /* appends a char to a string*/
 char* append(char* line, char c)
@@ -248,19 +242,19 @@ int removeUser(char* username, char* list)
 	return 0;
 }
 
-int main()
+/*int main()
 {
-	/*addUser("Nolan", "cats,dogs"); 
+	addUser("Nolan", "cats,dogs"); 
 	addUser("Ryan", "cats,dogs"); 
-	addUser("Rhys", "cats,dogs"); */
-	/*struct userPost st;
+	addUser("Rhys", "cats,dogs");
+	struct userPost st;
 	st.username = "Rhys";
 	st.streamname = "cats";
 	st.date = "todo";
-	st.text = "hi\nryan";*/
-	/*int sts = updateStream(&st);
+	st.text = "hi\nryan";*
+	int sts = updateStream(&st);
 	if (sts == -1)
-		printf("User Not Found\n");*/
+		printf("User Not Found\n");
 	removeUser("Ryan", "cats");
 	return 0;
-}
+}*/

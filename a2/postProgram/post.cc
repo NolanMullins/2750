@@ -2,14 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include "../stream.h"
 
-/* need to build stream lib */
-struct userPost {
-	char* username;
-	char* streamname;
-	char* date;
-	char* text;
-};
+/* post program */
 
 class PostEntry {
 	struct userPost post;
@@ -34,12 +29,12 @@ class PostEntry {
 	void getTimeDate(char* timeString)
 	{
 		time_t timeT;
-		struct tm* info;
 		time(&timeT);
-		info = localtime(&timeT);
+		struct tm* info = localtime(&timeT);
 
-		sprintf(timeString, "%d/%d/%d:%d/%d/%d", info->tm_sec, info->tm_min, info->tm_hour
-			, info->tm_mday, info->tm_mon+1, info->tm_year+1900);
+		sprintf(timeString, "%d/%d/%d:%d/%d/%d", info->tm_sec, info->tm_min, info->tm_hour,
+		 info->tm_mday, info->tm_mon+1, info->tm_year+1900);
+		/*sprintf(timeString, "%d/%d/%d", info->tm_mday, info->tm_mon+1, info->tm_year+1900);*/
 	}
 	void formatEntry()
 	{
@@ -60,12 +55,16 @@ class PostEntry {
 	int submitPost()
 	{
 		/* submit the post to the stream lib */
-		printf("\nSubmitting post\n\n");
+		/*printf("\nSubmitting post\n\n");
 		printf("%s\n", post.username);
 		printf("%s\n", post.streamname);
 		printf("%s\n", post.date);
-		printf("%s", post.text);
-
+		printf("%s", post.text);*/
+		int sts = updateStream(&post);
+		if (sts != 0)
+		{
+			printf("Error: %d\n", sts);
+		}
 		free(post.text);
 		free(post.date);
 		return 0;

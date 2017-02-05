@@ -1,10 +1,14 @@
 OBJQ1 = stream.o list.o
-FLAGS =-Wall -ansi -Iinclude -g 
+FLAGS =-Wall -ansi -Iinclude -g -Istream
 EXE = stream
 
 
 all:$(OBJQ1) 
 	gcc $(OBJQ1) -o $(EXE) $(FLAGS)
+
+lib:$(OBJQ1) 
+	ar rc stream.a $(OBJQ1) 
+
 clean:
 	rm $(OBJQ1) $(EXE)
 run:

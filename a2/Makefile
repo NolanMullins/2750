@@ -3,7 +3,7 @@
 #    2750 A2    #
 #################
 POST = post
-FLAGS = -Wall -ansi -Iinclude -g
+FLAGS = -Wall -ansi -Iinclude -g -L. -lstream
 EXE = post
 
 #Build and compile the c++ file
