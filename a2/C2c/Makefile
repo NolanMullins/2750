@@ -13,9 +13,9 @@ run:
 test:
 	gcc file.c 
 
-main.o: src/main.c
-	gcc -c src/main.c $(FLAGS)
-list.o: src/list.c
-	gcc -c src/list.c $(FLAGS)
-util.o: src/util.c
-	gcc -c src/util.c $(FLAGS)
+%.o: src/%.c
+	gcc -c src/$*.c $(FLAGS)
+#list.o: src/list.c
+#	gcc -c src/list.c $(FLAGS)
+#util.o: src/util.c
+#	gcc -c src/util.c $(FLAGS)

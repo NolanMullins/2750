@@ -17,7 +17,10 @@ run:
 test:
 	gcc file.c 
 
-stream.o: src/stream.c
-	gcc -c src/stream.c $(FLAGS)
-list.o: src/list.c include/list.h
-	gcc -c src/list.c $(FLAGS)
+%.o: src/%.c
+	gcc -c src/$*.c $(FLAGS)
+
+#stream.o: src/stream.c
+#	gcc -c src/stream.c $(FLAGS)
+#list.o: src/list.c include/list.h
+#	gcc -c src/list.c $(FLAGS)
