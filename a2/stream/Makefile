@@ -7,10 +7,10 @@ all:$(OBJQ1)
 	gcc $(OBJQ1) -o $(EXE) $(FLAGS)
 
 lib:$(OBJQ1) 
-	ar rc stream.a $(OBJQ1) 
+	ar rc libstream.a $(OBJQ1) 
 
 clean:
-	rm $(OBJQ1) $(EXE)
+	rm $(OBJQ1)
 run:
 	./$(EXE)
 
@@ -18,7 +18,7 @@ test:
 	gcc file.c 
 
 %.o: src/%.c
-	gcc -c src/$*.c $(FLAGS)
+	gcc -c src/$*.c $(FLAGS) -o $*.o
 
 #stream.o: src/stream.c
 #	gcc -c src/stream.c $(FLAGS)

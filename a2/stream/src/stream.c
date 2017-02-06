@@ -159,7 +159,10 @@ int addUser(char* username, char* list)
 			{
 				f = fopen(tmp, "w");
 				if (f == NULL)
+				{
 					printf("err: %s\n", strerror(errno));
+					exit(0);
+				}
 			}
 			else
 				f = fopen(tmp, "a");
