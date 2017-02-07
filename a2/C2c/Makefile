@@ -1,5 +1,5 @@
 OBJQ1 = main.o list.o util.o
-FLAGS =-Wall -ansi -Iinclude -g 
+FLAGS =-Wall -ansi -I*.h -g 
 EXE = C2c
 
 
@@ -13,8 +13,8 @@ run:
 test:
 	gcc file.c 
 
-%.o: src/%.c
-	gcc -c src/$*.c $(FLAGS)
+%.o: %.c
+	gcc -c $*.c $(FLAGS)
 #list.o: src/list.c
 #	gcc -c src/list.c $(FLAGS)
 #util.o: src/util.c

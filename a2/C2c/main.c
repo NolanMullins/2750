@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <list.h>
-#include <util.h>
+#include "list.h"
+#include "util.h"
 #include <string.h>
 
 int main(int argc, char* argv[])

@@ -1,5 +1,5 @@
 OBJQ1 = stream.o list.o
-FLAGS =-Wall -ansi -Iinclude -g -Istream
+FLAGS =-Wall -ansi -I*.h -g -Istream
 EXE = stream
 
 
@@ -17,8 +17,8 @@ run:
 test:
 	gcc file.c 
 
-%.o: src/%.c
-	gcc -c src/$*.c $(FLAGS) -o $*.o
+%.o: %.c
+	gcc -c $*.c $(FLAGS) -o $*.o
 
 #stream.o: src/stream.c
 #	gcc -c src/stream.c $(FLAGS)

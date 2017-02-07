@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "list.h"
 #include <string.h>
-#include <util.h>
+#include "util.h"
 
 #define myStruct "myStruct999"
 
