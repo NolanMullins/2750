@@ -39,10 +39,11 @@ lib:
 	make clean ;\
 	cd .. ;\
 	mv stream/libstream.a libstream.a -f ;\
-	cp stream/include/stream.h stream.h -f
+	cp stream/stream.h stream.h -f
 
 clean:
 	rm postProgram/$(POST).c $(EXE) $(EXEAUTHOR) libstream.a stream.h
 
-
+%.o : %.c
+	gcc -c $*.c -o $*.o $(FLAGS)
 	
