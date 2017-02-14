@@ -45,6 +45,7 @@ int cmp(char* name, char* line)
 		int a;
 		for (a = 0; a < lenN; a++)
 		{
+			/*printf("%c:%c ", name[a], line[a]);*/
 			if (name[a] != line[a])
 				return 0;
 		}
@@ -103,6 +104,10 @@ void printStruct(FILE* stream, FILE* data, struct userPost *st, int end)
 /* Lib functions */
 int updateStream(struct userPost *st)
 {
+	/*cleanup*/
+	if (st->streamname[strlen(st->streamname)-1] == '\n')
+		st->streamname[strlen(st->streamname)-1] = '\0';
+
 	char stream[256];
 	char data[256];
 	strcpy(stream, "msg/");

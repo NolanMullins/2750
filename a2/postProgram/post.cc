@@ -61,9 +61,9 @@ class PostEntry {
 		printf("%s\n", post.date);
 		printf("%s", post.text);*/
 		int sts = updateStream(&post);
-		if (sts != 0)
+		if (sts <= -1)
 		{
-			printf("Error: %d\n", sts);
+			printf("Error with stream: %d\n", sts);
 		}
 		free(post.text);
 		free(post.date);
@@ -75,6 +75,8 @@ int main(int argc, char* argv[])
 {
 	if (argc < 2)
 		printf("No username\n");
+	if (argc < 2)
+		exit(0);
 	int a;
 	char name[256];
 	strcpy(name, argv[1]);
@@ -83,6 +85,9 @@ int main(int argc, char* argv[])
 		strcat(name, " ");
 		strcat(name, argv[a]);
 	}
+	if (name[strlen(name)-1] == '\n')
+		printf("Found newline\n");
+		/*name[strlen(name)-1] = '\0';*/
 
 	class PostEntry entry;
 	entry.readInput(name);
