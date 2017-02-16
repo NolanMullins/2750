@@ -57,8 +57,9 @@ int cmp(char* name, char* line)
 int userExists(char* name, char* file)
 {
 	char tmp[256];
-	strcpy(tmp, "users/");
+	strcpy(tmp, "messages/");
 	strcat(tmp, file);
+	strcat(tmp, "StreamUsers");
 	FILE* f = fopen(tmp, "r");
 	if (f == NULL)
 		return 0;
@@ -97,7 +98,7 @@ void printStruct(FILE* stream, FILE* data, struct userPost *st, int end)
 {
 	fprintf(stream, "%s\n", st->username);
 	fprintf(stream, "%s\n", st->date);
-	fprintf(stream, "%s\n", st->text);
+	fprintf(stream, "%s", st->text);
 	fprintf(data, "%d\n", end);
 }
 
@@ -110,12 +111,12 @@ int updateStream(struct userPost *st)
 
 	char stream[256];
 	char data[256];
-	strcpy(stream, "msg/");
+	strcpy(stream, "messages/");
 	strcat(stream, st->streamname);
-	strcat(stream, "_stream");
-	strcpy(data, "msg/");
+	strcat(stream, "Stream");
+	strcpy(data, "messages/");
 	strcat(data, st->streamname);
-	strcat(data, "_data");
+	strcat(data, "StreamData");
 
 	FILE *streamF, *dataF;
 	if (userExists(st->username, st->streamname) == 0)
@@ -157,8 +158,9 @@ int addUser(char* username, char* list)
 		{
 			/* list function */
 			char tmp[256];
-			strcpy(tmp, "users/");
+			strcpy(tmp, "messages/");
 			strcat(tmp, stream);
+			strcat(tmp, "StreamUsers");
 			FILE* f;
 			if (fileNotFound(tmp))
 			{
@@ -203,8 +205,9 @@ int removeUser(char* username, char* list)
 		{
 			/* list function */
 			char tmp[256];
-			strcpy(tmp, "users/");
+			strcpy(tmp, "messages/");
 			strcat(tmp, stream);
+			strcat(tmp, "StreamUsers");
 			FILE* f;
 			if (fileNotFound(tmp))
 			{
