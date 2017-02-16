@@ -22,6 +22,13 @@ def changeStream (csr, user):
 	csr.clear()
 	return stream
 
+def displayBar(csr, yMax):
+	#csr.addstr(9, 0, str(yMax))
+	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
+
+def displayStream():
+	return 1
+
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
 		print("No arguments specified")
@@ -34,13 +41,17 @@ if __name__ == "__main__":
 
 	csr = curses.initscr()
 	curses.start_color()
+	size = csr.getmaxyx()
+	csr.addstr(2,0,str(size))
 
-	stream = changeStream(csr, name)
+	streams = changeStream(csr, name)
 
 	csr.addstr(0,0,"ID: "+name)
+	displayBar(csr, size[0])
 
 	while (1==1):
 		c = csr.getch(0,0)
+		csr.clear()
 		if (c == ord('q')):
 			break
 		elif (c == ord('o')):
@@ -52,8 +63,9 @@ if __name__ == "__main__":
 		elif (c == ord('s')):
 			stream = changeStream(csr, name)
 		#refresh page
-		csr.clear()
 		csr.addstr(0,0,"ID: "+name)
+		displayBar(csr, size[0])
+
 
 	curses.endwin()
 
