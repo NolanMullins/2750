@@ -32,20 +32,54 @@ def changeStream (csr, user):
 	csr.addstr(0,0,"Enter Stream: ")
 	stream = csr.getstr(0,14);
 	csr.clear()
-	return stream
+	return stream.decode()
 
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
-def loadStream(stream):
-	stream = open(stream+"Stream", "r")
-	streamData = open(stream+"StreamData", "r")
-	postBytes = 0
+def displayScreen(csr, posts):
+	csr.addstr(0,0,"ID: "+name)
+	c = 1
+	#curses.endwin()
+	for i in range(0,len(posts)):
+		csr.addstr(c,0,"************")
+		print("************")
+		c+=1
+		for line in posts[i]:
+			csr.addstr(c,0,line)
+			#print(line)
+			c+=1
+	#exit(0)
+	displayBar(csr, size[0])
 
-	for line in streamData
-		postBytes += int(line)
+def loadStream(streamName):
+	#if (os.path.isfile(fname))
+	stream = open("messages/"+streamName+"Stream", "r")
+	streamData = open("messages/"+streamName+"StreamData", "r")
+	
+	#curses.endwin()
 
-	return ""
+	numBytes = 0
+	posts = []
+	numposts = 0
+	for line in streamData:
+		line = line.rstrip("\n")
+		postBytes = 0
+		postlines = [streamName]
+		#print("*********")
+		for line2 in stream:
+			line2 = line2.rstrip("\n")
+			postBytes += len(line2)
+			postlines.append(line2)
+			if (postBytes+numBytes >= int(line)):
+				break
+		#print(postlines)
+		numBytes += postBytes
+		posts.append([])
+		posts[numposts] = postlines
+		numposts+=1
+	#exit(0)
+	return posts
 
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
@@ -62,10 +96,10 @@ if __name__ == "__main__":
 	size = csr.getmaxyx()
 	csr.addstr(2,0,str(size))
 
-	streams = changeStream(csr, name)
+	stream = changeStream(csr, name)
+	posts = list(loadStream(stream))
 
-	csr.addstr(0,0,"ID: "+name)
-	displayBar(csr, size[0])
+	displayScreen(csr, posts)
 
 	while (1==1):
 		c = csr.getch(0,0)
@@ -81,9 +115,7 @@ if __name__ == "__main__":
 		elif (c == ord('s')):
 			stream = changeStream(csr, name)
 		#refresh page
-		csr.addstr(0,0,"ID: "+name)
-		displayBar(csr, size[0])
-
+		displayScreen(csr, posts)
 
 	curses.endwin()
 

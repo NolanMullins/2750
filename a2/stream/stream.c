@@ -156,6 +156,7 @@ int updateStream(struct userPost *st)
 			line[strlen(line)-1] = '\0';
 		numBytes+=atoi(line);
 	}
+	printf("%d\n", numBytes);
 	fclose(readBytes);
 	dataF = fopen(data, "a");
 	/* find number of lines in this post */
