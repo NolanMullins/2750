@@ -36,11 +36,22 @@ int fileNotFound(char* fileName)
 	return 0;
 }
 
+int indexOfLastSpace(char* line)
+{
+	int len = strlen(line);
+	int a;
+	for (a=len-1; a>=0; a--)
+		if (line[a] == ' ')
+			return a;
+	return -1;
+}
+
 int cmp(char* name, char* line)
 {
 	/* cmp */
 	int lenN = strlen(name), lenL = strlen(line);
-	if (lenN < lenL)
+	int sizeOfName = indexOfLastSpace(line);
+	if (lenN == sizeOfName)
 	{
 		int a;
 		for (a = 0; a < lenN; a++)
