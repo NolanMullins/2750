@@ -13,8 +13,6 @@ def getUser(line):
 	user = user[:-1]
 	return user
 		
-
-
 def signin(filename, user):
 	if (len(user) == 0):
 		return -1

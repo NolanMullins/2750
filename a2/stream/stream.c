@@ -49,7 +49,7 @@ int indexOfLastSpace(char* line)
 int cmp(char* name, char* line)
 {
 	/* cmp */
-	int lenN = strlen(name), lenL = strlen(line);
+	int lenN = strlen(name);/*, lenL = strlen(line);*/
 	int sizeOfName = indexOfLastSpace(line);
 	if (lenN == sizeOfName)
 	{
@@ -96,13 +96,15 @@ void createFile(char* fileName)
 
 int sizeOfPost(struct userPost *st)
 {
-	int numLinePost = 3;
+	int numBytes = strlen(st->username);
+	numBytes += strlen(st->date);
+	numBytes += strlen(st->text);
 	int a;
 	int size = strlen(st->text);
 	for (a = 0; a < size; a++)
 		if (st->text[a] == '\n' || st->text[a] == '\r')
-			numLinePost++;
-	return numLinePost;
+			numBytes--;
+	return numBytes;
 }
 
 void printStruct(FILE* stream, FILE* data, struct userPost *st, int end)
@@ -138,20 +140,27 @@ int updateStream(struct userPost *st)
 		dataF = fopen(data, "w");
 		if (streamF == NULL)
 			printf("err: %s\n", strerror(errno));
-		printStruct(streamF, dataF, st,sizeOfPost(st)-1);
+		printStruct(streamF, dataF, st,sizeOfPost(st));
 		fclose(streamF);
 		fclose(dataF);
 		return 1;
 	}
 	streamF = fopen(stream, "a+");
-	dataF = fopen(data, "a");
-	int numLines = 0;
+	FILE* readBytes = fopen(data, "r");
+	int numBytes = 0;
 	char line[256];
 	/* find number of lines in file */
-	while(fgets(line, 255, streamF) != NULL) numLines++;
+	while(fgets(line, 255, readBytes) != NULL) 
+	{
+		if (line[strlen(line)-1] == '\n')
+			line[strlen(line)-1] = '\0';
+		numBytes+=atoi(line);
+	}
+	fclose(readBytes);
+	dataF = fopen(data, "a");
 	/* find number of lines in this post */
-	int postLines = sizeOfPost(st);
-	printStruct(streamF, dataF, st, numLines+postLines-1);
+	int postBytes = sizeOfPost(st);
+	printStruct(streamF, dataF, st, numBytes+postBytes);
 	
 	fclose(streamF);
 	fclose(dataF);
