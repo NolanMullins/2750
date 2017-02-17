@@ -35,11 +35,17 @@ def changeStream (csr, user):
 	return stream
 
 def displayBar(csr, yMax):
-	#csr.addstr(9, 0, str(yMax))
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
-def displayStream():
-	return 1
+def loadStream(stream):
+	stream = open(stream+"Stream", "r")
+	streamData = open(stream+"StreamData", "r")
+	postBytes = 0
+
+	for line in streamData
+		postBytes += int(line)
+
+	return ""
 
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
