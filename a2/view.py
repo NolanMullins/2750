@@ -3,10 +3,24 @@ import sys
 import curses
 import os
 
+def getUser(line):
+	words = line.split(" ")
+	user = "";
+	if (len(words)==0):
+		return ""
+	for i in range (0,len(words)-1):
+		user+=words[i]+" "
+	user = user[:-1]
+	return user
+		
+
+
 def signin(filename, user):
+	if (len(user) == 0):
+		return -1
 	file = open("messages/"+filename, "r")
 	for line in file:
-		if (user in line):
+		if (user == getUser(line)):#user == line[0:len(user)]):
 			return 1
 	return -1
 
