@@ -77,14 +77,35 @@ def changeStream (csr, user):
 	stream = csr.getstr(0,14);
 	csr.clear()
 	posts = []
+	index = 0
+	nameIndex = ""
+	dateIndex = ""
 	if (stream.decode() == "all"):
 		print("all")
 		for f in os.listdir("messages"):
 			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
-				posts += (list(loadStream(f[:-6], name)))
+				streamPosts = (list(loadStream(f[:-6], name)))
+				
+				if (len(dateIndex) != 0):
+					tmpIndex = getRead(f[:-6], name)
+					#Tmp is older than index
+					if (cmp(dateIndex, streamPosts[tmpIndex][2]) == 0):
+						index = tmpIndex
+						nameIndex = f[:-6]
+						dateIndex = streamPosts[tmpIndex][2]
+				else:
+					index = getRead(f[:-6], name)
+					nameIndex = f[:-6]
+					dateIndex = streamPosts[index][2]
+				posts += streamPosts
 	else:
+		if (not os.path.isfile("messages/"+stream.decode()+"Stream")):
+			return []
 		posts = list(loadStream(stream.decode(), name))
-	return sortPosts(posts)
+		index = getRead(stream.decode(), name)
+		nameIndex = stream.decode()
+	posts = sortPosts(posts)
+	return posts
 
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
@@ -124,20 +145,24 @@ def displayScreen(csr, posts, size, index):
 	return numPosts
 
 def cmpIntList(a, b):
-	for i in range(len(a)-1, 0, -1):
+	for i in range(len(a)-1, -1, -1):
 		if (int(a[i]) > int(b[i])):
+			return 0
+		elif (int(a[i]) < int(b[i])):
 			return 1
-	return 0
+	return -1
+
+#will return 1 if 2 is newer than 1
 def cmp(date1, date2):
-	tmp1 = date1
-	tmp2 = date2
-	time1 = tmp1.split(":")
-	time2 = tmp2.split(":")
-	r = 0
-	if (cmpIntList(time1[1].split("/"), time2[1].split("/"))==1):
-		r = 1
-	elif (cmpIntList(time1[0].split("/"), time2[0].split("/"))==1):
-		r = 1
+	time1 = date1.split(":")
+	time2 = date2.split(":")
+	r = -1
+	tmp = cmpIntList(time1[1].split("/"), time2[1].split("/"))
+	tmp2 = cmpIntList(time1[0].split("/"), time2[0].split("/"))
+	if (tmp!=-1):
+		r = tmp
+	elif (tmp2!=-1):
+		r = tmp2
 	#if (r == 1):
 	#	print(date1+ " > " + date2)
 	#else:
@@ -147,7 +172,7 @@ def cmp(date1, date2):
 def sortPosts(posts):
 	for a in range(0,len(posts)-1):
 		for b in range(0, len(posts)-1):
-			if (cmp(posts[b][2], posts[b+1][2]) == 1):
+			if (cmp(posts[b][2], posts[b+1][2]) == 0):
 				tmp = posts[b]
 				posts[b] = posts[b+1]
 				posts[b+1] = tmp
@@ -163,8 +188,6 @@ def pageUpShift(posts, index, csr):
 		screenFill += len(posts[index-offset])+1
 		offset += 1
 	offset-=1
-	csr.addstr(27, 0, "screen fill: "+str(screenFill))
-	csr.addstr(28, 0, "posts up: "+str(offset))
 	if (screenFill > 24):
 		offset -= 1
 
