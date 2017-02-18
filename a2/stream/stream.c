@@ -154,13 +154,14 @@ int updateStream(struct userPost *st)
 	{
 		if (line[strlen(line)-1] == '\n')
 			line[strlen(line)-1] = '\0';
-		numBytes+=atoi(line);
+		numBytes=atoi(line);
 	}
-	printf("%d\n", numBytes);
 	fclose(readBytes);
 	dataF = fopen(data, "a");
+	/*printf("%d\n", numBytes);*/
 	/* find number of lines in this post */
 	int postBytes = sizeOfPost(st);
+	/*printf("postSize: %d\n", postBytes);*/
 	printStruct(streamF, dataF, st, numBytes+postBytes);
 	
 	fclose(streamF);
@@ -191,6 +192,23 @@ int addUser(char* username, char* list)
 					printf("err: %s\n", strerror(errno));
 					exit(0);
 				}
+				char streamPath[256];
+				char data[256];
+				strcpy(streamPath, "messages/");
+				strcat(streamPath, stream);
+				strcat(streamPath, "Stream");
+				strcpy(data, "messages/");
+				strcat(data, stream);
+				strcat(data, "StreamData");
+				FILE* streamF = fopen(streamPath, "w");
+				FILE* dataF = fopen(data, "w");
+				if (streamF == NULL)
+				{
+					printf("err: %s\n", strerror(errno));
+					exit(0);
+				}
+				fclose(dataF);
+				fclose(streamF);
 			}
 			else
 				f = fopen(tmp, "a");
