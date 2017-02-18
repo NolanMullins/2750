@@ -33,6 +33,26 @@ def getRead(filename, user):
 	return 0
 
 def setRead(filename, user, postNum):
+	if (len(user) == 0):
+		return -1
+	#curses.endwin()
+	file = open("messages/"+filename+"StreamUsers", "r")
+	newFile = []
+	for line in file:
+		if (user == getUser(line)):#user == line[0:len(user)]):
+			arr = line.split(" ")
+			newline = ""
+			for a in range(0, len(arr)-1):
+				newline += arr[a]+" "
+			newline += str(postNum)
+			newFile.append(newline)
+		else:
+			newFile.append(line.rstrip("\n"))
+	file = open("messages/"+filename+"StreamUsers", "w")
+	for line in newFile:
+		file.write(line+"\n")
+	#print(newFile)
+	#exit(0)
 	return 0
 
 def loadStream(streamName, user):
@@ -66,6 +86,26 @@ def loadStream(streamName, user):
 	#exit(0)
 	return sortPosts(posts)
 
+def indexOfXStream(stream, postNum, posts):
+	index = 0
+	streamPos = 0
+	for a in range(0, len(posts)):
+		if (posts[a][0] == stream):
+			if (streamPos == postNum):
+				return index
+			streamPos += 1
+		index += 1
+	return index
+
+def indexInStream(stream, indexMaster, posts):
+	streamPos = 0
+	for a in range(0, len(posts)):
+		if (posts[a][0] == stream):
+			streamPos += 1
+		if (a == indexMaster):
+			return streamPos
+	return streamPos
+
 def changeStream (csr, user):
 	csr.clear()
 	c = 1
@@ -88,29 +128,36 @@ def changeStream (csr, user):
 				
 				if (len(dateIndex) != 0):
 					tmpIndex = getRead(f[:-6], name)
+
 					#Tmp is older than index
-					if (cmp(dateIndex, streamPosts[tmpIndex][2]) == 0):
-						index = tmpIndex
-						nameIndex = f[:-6]
-						dateIndex = streamPosts[tmpIndex][2]
+					if (tmpIndex < len(streamPosts)):
+						if (cmp(dateIndex, streamPosts[tmpIndex][2]) == 0):
+							index = tmpIndex
+							nameIndex = f[:-6]
+							dateIndex = streamPosts[tmpIndex][2]
 				else:
 					index = getRead(f[:-6], name)
 					nameIndex = f[:-6]
-					dateIndex = streamPosts[index][2]
+					if (index >= len(streamPosts)):
+						index = 0
+					else: 
+						dateIndex = streamPosts[index][2]
 				posts += streamPosts
 	else:
 		if (not os.path.isfile("messages/"+stream.decode()+"Stream")):
-			return []
+			return 0,[]
 		posts = list(loadStream(stream.decode(), name))
 		index = getRead(stream.decode(), name)
 		nameIndex = stream.decode()
 	posts = sortPosts(posts)
-	return posts
+	#get index of first unread post in stream
+	index = indexOfXStream(nameIndex, index, posts)
+	return index, posts
 
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
-def displayScreen(csr, posts, size, index):
+def displayScreen(csr, posts, size, index, user):
 	csr.addstr(0,0,"ID: "+name)
 	displayBar(csr, size[0])
 	c = 1
@@ -136,6 +183,10 @@ def displayScreen(csr, posts, size, index):
 				return numPosts-1
 			csr.addstr(c,0,posts[i][j])
 			c+=1
+		#mark post as read
+		indexIn = indexInStream(posts[i][0], i, posts)
+		if (getRead(posts[i][0], user) < indexIn):
+			setRead(posts[i][0], user,  indexIn)
 		#for line in posts[i]:
 		#	csr.addstr(c,0,line)
 		#	#print(line)
@@ -210,10 +261,9 @@ if __name__ == "__main__":
 		size[0] = 24
 
 	#stream = changeStream(csr, name)
-	posts = list(changeStream(csr,name))
-
 	index = 0
-	numPostsOnScreen = displayScreen(csr, posts, size, index)
+	index, posts = list(changeStream(csr,name))
+	numPostsOnScreen = displayScreen(csr, posts, size, index, name)
 	while (1==1):
 		c = csr.getch(0,0)
 		csr.clear()
@@ -228,8 +278,7 @@ if __name__ == "__main__":
 		elif (c == ord('s')):
 			#stream = changeStream(csr, name)
 			#posts = list(loadStream(stream, name))
-			posts = (list(changeStream(csr,name)))
-			index = 0
+			index, posts = (list(changeStream(csr,name)))
 		elif (c == 65): #up
 			if (index > 0):
 				index -= pageUpShift(posts, index, csr)
@@ -237,6 +286,6 @@ if __name__ == "__main__":
 			if (index+numPostsOnScreen < len(posts)):
 				index += numPostsOnScreen
 		#refresh page
-		numPostsOnScreen = displayScreen(csr, posts, size, index)
+		numPostsOnScreen = displayScreen(csr, posts, size, index, name)
 	curses.endwin()
 
