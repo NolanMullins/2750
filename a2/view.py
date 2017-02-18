@@ -153,6 +153,23 @@ def sortPosts(posts):
 				posts[b+1] = tmp
 	return posts
 
+def pageUpShift(posts, index, csr):
+	if (index == 0):
+		return 0
+	screenFill = 0
+	offset = 1
+	while screenFill < 24 and index-offset >= 0:
+		#csr.addstr(28+offset, 0, "index up: "+str(index)+"  lines: "+str(len(posts[index-offset])+1))
+		screenFill += len(posts[index-offset])+1
+		offset += 1
+	offset-=1
+	csr.addstr(27, 0, "screen fill: "+str(screenFill))
+	csr.addstr(28, 0, "posts up: "+str(offset))
+	if (screenFill > 24):
+		offset -= 1
+
+	return offset
+
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
 		print("No arguments specified")
@@ -189,9 +206,10 @@ if __name__ == "__main__":
 			#stream = changeStream(csr, name)
 			#posts = list(loadStream(stream, name))
 			posts = (list(changeStream(csr,name)))
+			index = 0
 		elif (c == 65): #up
 			if (index > 0):
-				index -= 1
+				index -= pageUpShift(posts, index, csr)
 		elif (c == 66): #down
 			if (index+numPostsOnScreen < len(posts)):
 				index += numPostsOnScreen
