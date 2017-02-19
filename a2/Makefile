@@ -4,11 +4,12 @@
 #################
 POST = post
 FLAGS = -Wall -ansi -Iinclude -g -L. -lstream
+OBJQ1 = stream.o list.o
 EXE = post
 AUTHOR = addAuthor.c
 EXEAUTHOR = addauthor
 
-all: echo lib conv author
+all: echo buildLib conv author
 	chmod +x view.py
 	@echo "Done Building"
 
@@ -35,15 +36,21 @@ gcc:
 buildC2c:
 	cd C2c && make && cd ..
 
-lib:
-	cd stream && make lib ;\
-	make clean ;\
-	cd .. ;\
-	mv stream/libstream.a libstream.a -f ;\
-	cp stream/stream.h stream.h -f
+buildLib: $(OBJQ1)
+	ar rc libstream.a $(OBJQ1) 
+
+stream.o: stream.c
+	gcc -c $*.c -o $*.o -Wall -ansi -I*.h -g -Istream
+
+#lib:
+#	cd stream && make lib ;\
+#	make clean ;\
+#	cd .. ;\
+#	mv stream/libstream.a libstream.a -f ;\
+#	cp stream/stream.h stream.h -f
 
 clean:
-	rm $(POST).c $(EXE) $(EXEAUTHOR) libstream.a stream.h
+	rm $(POST).c $(EXE) $(EXEAUTHOR) libstream.a *.o
 
 %.o : %.c
 	gcc -c $*.c -o $*.o $(FLAGS)

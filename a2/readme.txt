@@ -12,16 +12,18 @@ and reload them.
 Known issues
  - posts have to be less than 25 lines long, else you will not be able to move to the next post
 
-***Instructions - compile***
-type: make
-output:
-	post
-	addauthor
+/**********************************/
+	Instructions - compile
+		type: make
+		output:
+		post
+		addauthor
+/**********************************/
 
-***Instructions - run***
-type: ./post UserID
-type: ./addauthor UserID
-./view.py UserID
-
-TODO
-valgrind
+/**********************************/
+	Instructions - run
+	
+	type: ./post UserID
+	type: ./addauthor UserID
+	./view.py UserID
+/**********************************/
