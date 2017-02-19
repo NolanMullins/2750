@@ -213,7 +213,7 @@ def getTime(line):
 	strTime += time[2]+":"+time[1]
 	return strTime
 
-def displayScreen(csr, posts, size, index, user, flag):
+def displayScreen(csr, posts, size, index, user, flag, lineStart):
 	csr.addstr(0,0,"ID: "+name)
 	displayBar(csr, size[0])
 	c = 1
@@ -221,42 +221,49 @@ def displayScreen(csr, posts, size, index, user, flag):
 	#curses.endwin()
 	if (index >= len(posts) and index > 0):
 		index -= 1
+	linesIn = 0
 	for i in range(index,len(posts)):
 		numPosts+=1
+		linesIn = 0
 		if (c > size[0]-2):
-			return numPosts-1
+			return numPosts-1, linesIn
 		csr.addstr(c,0,"************")
 		c+=1
 		if (c > size[0]-2):
-			return numPosts-1
+			return numPosts-1, linesIn
 		csr.addstr(c,0,"Stream: "+posts[i][0])
 		c+=1
 		if (c > size[0]-2):
-			return numPosts-1
+			return numPosts-1, linesIn
 		csr.addstr(c,0,"User: "+posts[i][1])
 		c+=1
 		#date
 		if (c > size[0]-2):
-			return numPosts-1
+			return numPosts-1, linesIn
 
 		date = getTime(posts[i][2])
 		csr.addstr(c,0,"Date: "+date)
 		c+=1
 		#text section
-		for j in range(3,len(posts[i])):
+		linesIn += lineStart
+		for j in range(3+lineStart,len(posts[i])):
 			if (len(posts[i][j]) > 80):
 				lines = posts[i][j]
 				lines = [lines[i:i+80] for i in range(0, len(lines), 80)]
 				for a in range(0,len(lines)):
 					if (c > size[0]-2):
-						return numPosts-1
+						return numPosts-1, linesIn
 					csr.addstr(c,0,lines[a])
 					c+=1
+					linesIn+=1
 			else:
 				if (c > size[0]-2):
-					return numPosts-1
+					return numPosts-1, linesIn
 				csr.addstr(c,0,posts[i][j])
 				c+=1
+				linesIn+=1
+		lineStart = 0
+		linesIn = 0
 		#mark post as read
 		indexIn = indexInStream(posts[i][0], i, posts)
 		if (flag == 1 and getRead(posts[i][0], user) < indexIn):
@@ -267,7 +274,7 @@ def displayScreen(csr, posts, size, index, user, flag):
 		#	c+=1
 	#exit(0)
 	
-	return numPosts
+	return numPosts, linesIn
 
 def cmpIntList(a, b):
 	for i in range(len(a)-1, -1, -1):
@@ -312,9 +319,9 @@ def sortPostsAuthor(posts):
 				posts[b+1] = tmp
 	return posts
 
-def pageUpShift(posts, index, csr):
+def pageUpShift(posts, index, csr, lineStart):
 	if (index == 0):
-		return 0
+		return 0, 0
 	screenFill = 0
 	offset = 1
 	while screenFill < 24 and index-offset >= 0:
@@ -324,8 +331,16 @@ def pageUpShift(posts, index, csr):
 	offset-=1
 	if (screenFill > 24):
 		offset -= 1
+		if (offset == 0):
+			offset = 1
+			lenOfPost = len(posts[index])-3
+			lineStart = 0
+		else:
+			lineStart = 0
+	else:
+		lineStart = 0
 
-	return offset
+	return offset, lineStart
 
 def markAllRead(posts, user):
 	stream = {}
@@ -337,8 +352,8 @@ def markAllRead(posts, user):
 	#print(stream)
 
 if __name__ == "__main__":
-	if (len(sys.argv) <= -1):
-		print("No arguments specified")
+	if (len(sys.argv) <= 1):
+		print("No User specified")
 		exit(0)
 
 	name = ""
@@ -358,7 +373,7 @@ if __name__ == "__main__":
 		flag = 1
 		index = 0
 		index, posts, curStream = list(changeStream(csr,name))
-		numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
+		numPostsOnScreen, lineStart = displayScreen(csr, posts, size, index, name, flag, 0)
 		while (1==1):
 			c = csr.getch(0,0)
 			csr.clear()
@@ -386,12 +401,17 @@ if __name__ == "__main__":
 
 			elif (c == 65): #up
 				if (index > 0):
-					index -= pageUpShift(posts, index, csr)
+					if (index >= len(posts)):
+						index -= 1
+					tmp, lineStart = pageUpShift(posts, index, csr, lineStart)
+					index-=tmp
+				else:
+					lineStart = 0
 			elif (c == 66): #down
 				if (index+numPostsOnScreen < len(posts)):
 					index += numPostsOnScreen
 			#refresh page
-			numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
+			numPostsOnScreen, lineStart = displayScreen(csr, posts, size, index, name, flag, lineStart)
 	except Exception:
 		curses.endwin()
 		traceback.print_exc()
