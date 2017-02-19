@@ -2,6 +2,7 @@
 import sys
 import curses
 import os
+import datetime
 
 def getUser(line):
 	words = line.split(" ")
@@ -202,6 +203,15 @@ def refreshStream (csr, user, stream):
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
+def getTime(line):
+	line = line.split(":")
+	date = line[1].split("/")
+	time = line[0].split("/")
+	dateTime = datetime.datetime(int(date[2]), int(date[1]), int(date[0]))
+	strTime = dateTime.strftime("%b %d, %y - ")
+	strTime += time[2]+":"+time[1]
+	return strTime
+
 def displayScreen(csr, posts, size, index, user, flag):
 	csr.addstr(0,0,"ID: "+name)
 	displayBar(csr, size[0])
@@ -221,9 +231,16 @@ def displayScreen(csr, posts, size, index, user, flag):
 		if (c > size[0]-2):
 			return numPosts-1
 		csr.addstr(c,0,"User: "+posts[i][1])
-		#print("************")
 		c+=1
-		for j in range(2,len(posts[i])):
+		#date
+		if (c > size[0]-2):
+			return numPosts-1
+
+		date = getTime(posts[i][2])
+		csr.addstr(c,0,"Date: "+date)
+		c+=1
+		#text section
+		for j in range(3,len(posts[i])):
 			if (c > size[0]-2):
 				return numPosts-1
 			csr.addstr(c,0,posts[i][j])
