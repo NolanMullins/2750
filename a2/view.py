@@ -139,7 +139,7 @@ def changeStream (csr, user):
 					index = getRead(f[:-6], name)
 					nameIndex = f[:-6]
 					if (index >= len(streamPosts)):
-						index = 0
+						index = -1
 					else: 
 						dateIndex = streamPosts[index][2]
 				posts += streamPosts
@@ -151,13 +151,58 @@ def changeStream (csr, user):
 		nameIndex = stream.decode()
 	posts = sortPosts(posts)
 	#get index of first unread post in stream
-	index = indexOfXStream(nameIndex, index, posts)
+	if (index == -1):
+		index = len(posts)-1
+	else:
+		index = indexOfXStream(nameIndex, index, posts)
+	return index, posts, stream.decode()
+
+def refreshStream (csr, user, stream):
+	posts = []
+	index = 0
+	nameIndex = ""
+	dateIndex = ""
+	if (stream == "all"):
+		print("all")
+		for f in os.listdir("messages"):
+			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
+				streamPosts = (list(loadStream(f[:-6], name)))
+				
+				if (len(dateIndex) != 0):
+					tmpIndex = getRead(f[:-6], name)
+
+					#Tmp is older than index
+					if (tmpIndex < len(streamPosts)):
+						if (cmp(dateIndex, streamPosts[tmpIndex][2]) == 0):
+							index = tmpIndex
+							nameIndex = f[:-6]
+							dateIndex = streamPosts[tmpIndex][2]
+				else:
+					index = getRead(f[:-6], name)
+					nameIndex = f[:-6]
+					if (index >= len(streamPosts)):
+						index = -1
+					else: 
+						dateIndex = streamPosts[index][2]
+				posts += streamPosts
+	else:
+		if (not os.path.isfile("messages/"+stream+"Stream")):
+			return 0,[]
+		posts = list(loadStream(stream, name))
+		index = getRead(stream, name)
+		nameIndex = stream
+	posts = sortPosts(posts)
+	#get index of first unread post in stream
+	if (index == -1):
+		index = len(posts)-1
+	else:
+		index = indexOfXStream(nameIndex, index, posts)
 	return index, posts
 
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
-def displayScreen(csr, posts, size, index, user):
+def displayScreen(csr, posts, size, index, user, flag):
 	csr.addstr(0,0,"ID: "+name)
 	displayBar(csr, size[0])
 	c = 1
@@ -185,7 +230,7 @@ def displayScreen(csr, posts, size, index, user):
 			c+=1
 		#mark post as read
 		indexIn = indexInStream(posts[i][0], i, posts)
-		if (getRead(posts[i][0], user) < indexIn):
+		if (flag == 1 and getRead(posts[i][0], user) < indexIn):
 			setRead(posts[i][0], user,  indexIn)
 		#for line in posts[i]:
 		#	csr.addstr(c,0,line)
@@ -229,6 +274,15 @@ def sortPosts(posts):
 				posts[b+1] = tmp
 	return posts
 
+def sortPostsAuthor(posts):
+	for a in range(0,len(posts)-1):
+		for b in range(0, len(posts)-1):
+			if (posts[b][1] > posts[b+1][1]):
+				tmp = posts[b]
+				posts[b] = posts[b+1]
+				posts[b+1] = tmp
+	return posts
+
 def pageUpShift(posts, index, csr):
 	if (index == 0):
 		return 0
@@ -245,7 +299,6 @@ def pageUpShift(posts, index, csr):
 	return offset
 
 def markAllRead(posts, user):
-	curses.endwin()
 	stream = {}
 	for a in range(0,len(posts)):
 		stream[posts[a][0]] = stream.get(posts[a][0], 0)+1
@@ -253,7 +306,6 @@ def markAllRead(posts, user):
 		setRead(key, user, value)
 		#print(key +" : "+ str(value))
 	#print(stream)
-	exit(0)
 
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
@@ -272,24 +324,35 @@ if __name__ == "__main__":
 		size[0] = 24
 
 	#stream = changeStream(csr, name)
+	flag = 1
 	index = 0
-	index, posts = list(changeStream(csr,name))
-	numPostsOnScreen = displayScreen(csr, posts, size, index, name)
+	index, posts, curStream = list(changeStream(csr,name))
+	numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
 	while (1==1):
 		c = csr.getch(0,0)
 		csr.clear()
 		if (c == ord('q')):
 			break
 		elif (c == ord('o')):
-			csr.addstr(1,0,"O cmd")
+			flag = flag*-1
+			if (flag == 1):
+				posts = sortPosts(posts)
+			else:
+				posts = sortPostsAuthor(posts)
+
 		elif (c == ord('m')):
 			markAllRead(posts, name)
 		elif (c == ord('c')):
-			csr.addstr(1,0,"C cmd")
+			index, posts = refreshStream(csr, name, curStream)
+			if (flag == -1):
+				posts = sortPostsAuthor(posts)
 		elif (c == ord('s')):
 			#stream = changeStream(csr, name)
 			#posts = list(loadStream(stream, name))
-			index, posts = (list(changeStream(csr,name)))
+			index, posts, curStream = (list(changeStream(csr,name)))
+			if (flag == -1):
+				posts = sortPostsAuthor(posts)
+
 		elif (c == 65): #up
 			if (index > 0):
 				index -= pageUpShift(posts, index, csr)
@@ -297,6 +360,6 @@ if __name__ == "__main__":
 			if (index+numPostsOnScreen < len(posts)):
 				index += numPostsOnScreen
 		#refresh page
-		numPostsOnScreen = displayScreen(csr, posts, size, index, name)
+		numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
 	curses.endwin()
 
