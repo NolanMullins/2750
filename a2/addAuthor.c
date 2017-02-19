@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../stream.h"
+#include "stream.h"
 
 /*int addUser(char* username, char* list);*/
 
@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
 	fgets(streams, 255, stdin);
 	if (streams[strlen(streams)-1] == '\n')
 		streams[strlen(streams)-1] = '\0';
+	if (strlen(streams) == 0)
+		return 0;
 	int flag = strcmp("-r", argv[1]);
 	int a = 0;
 	if (flag==0)

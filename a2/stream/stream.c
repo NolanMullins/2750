@@ -133,7 +133,10 @@ int updateStream(struct userPost *st)
 
 	FILE *streamF, *dataF;
 	if (userExists(st->username, st->streamname) == 0)
-		return -1;
+	{
+		printf("User does not have access to stream: %s\n", st->streamname);
+		return 2;
+	}
 	if (fileNotFound(stream))
 	{
 		streamF = fopen(stream, "w");
@@ -207,6 +210,7 @@ int addUser(char* username, char* list)
 					printf("err: %s\n", strerror(errno));
 					exit(0);
 				}
+				printf("Creating stream: %s\n", stream);
 				fclose(dataF);
 				fclose(streamF);
 			}
@@ -214,7 +218,7 @@ int addUser(char* username, char* list)
 				f = fopen(tmp, "a");
 			if (userExists(username, stream))
 			{
-				printf("User already in file %s\n", stream);
+				printf("User already in stream: %s\n", stream);
 			}
 			else
 			{

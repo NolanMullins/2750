@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../stream.h"
+#include "stream.h"
 
 /* post program */
 

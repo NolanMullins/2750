@@ -5,7 +5,7 @@
 POST = post
 FLAGS = -Wall -ansi -Iinclude -g -L. -lstream
 EXE = post
-AUTHOR = author/addAuthor.c
+AUTHOR = addAuthor.c
 EXEAUTHOR = addauthor
 
 all: echo lib conv author
@@ -19,17 +19,17 @@ author: $(AUTHOR)
 	gcc $(AUTHOR) $(FLAGS) -o $(EXEAUTHOR)
 
 #Build and compile the c++ file
-conv: postProgram/$(POST).cc runC2c
+conv: $(POST).cc runC2c
 	@echo "Building post program" ;\
-	gcc postProgram/$(POST).c $(FLAGS) -o $(EXE)
+	gcc $(POST).c $(FLAGS) -o $(EXE)
 
 runC2c: buildC2c
-	cp postProgram/$(POST).cc C2c/$(POST).cc -f ;\
+	cp $(POST).cc C2c/$(POST).cc -f ;\
 	cd C2c && ./C2c $(POST).cc && make clean && rm $(POST).cc \
-	&& cd .. && mv C2c/$(POST).c postProgram/$(POST).c
+	&& cd .. && mv C2c/$(POST).c $(POST).c
 
 gcc:
-	gcc postProgram/$(POST).c $(FLAGS) -o $(EXE)
+	gcc $(POST).c $(FLAGS) -o $(EXE)
 
 buildC2c:
 	cd C2c && make && cd ..
@@ -42,7 +42,7 @@ lib:
 	cp stream/stream.h stream.h -f
 
 clean:
-	rm postProgram/$(POST).c $(EXE) $(EXEAUTHOR) libstream.a stream.h
+	rm $(POST).c $(EXE) $(EXEAUTHOR) libstream.a stream.h
 
 %.o : %.c
 	gcc -c $*.c -o $*.o $(FLAGS)
