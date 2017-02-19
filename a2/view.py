@@ -3,6 +3,7 @@ import sys
 import curses
 import os
 import datetime
+import traceback
 
 def getUser(line):
 	words = line.split(" ")
@@ -139,14 +140,14 @@ def changeStream (csr, user):
 				else:
 					index = getRead(f[:-6], name)
 					nameIndex = f[:-6]
-					if (index >= len(streamPosts)):
+					if (index >= len(streamPosts) and index > 0):
 						index = -1
 					else: 
 						dateIndex = streamPosts[index][2]
 				posts += streamPosts
 	else:
 		if (not os.path.isfile("messages/"+stream.decode()+"Stream")):
-			return 0,[]
+			return 0,[], ""
 		posts = list(loadStream(stream.decode(), name))
 		index = getRead(stream.decode(), name)
 		nameIndex = stream.decode()
@@ -218,6 +219,8 @@ def displayScreen(csr, posts, size, index, user, flag):
 	c = 1
 	numPosts = 0
 	#curses.endwin()
+	if (index >= len(posts) and index > 0):
+		index -= 1
 	for i in range(index,len(posts)):
 		numPosts+=1
 		if (c > size[0]-2):
@@ -241,10 +244,19 @@ def displayScreen(csr, posts, size, index, user, flag):
 		c+=1
 		#text section
 		for j in range(3,len(posts[i])):
-			if (c > size[0]-2):
-				return numPosts-1
-			csr.addstr(c,0,posts[i][j])
-			c+=1
+			if (len(posts[i][j]) > 80):
+				lines = posts[i][j]
+				lines = [lines[i:i+80] for i in range(0, len(lines), 80)]
+				for a in range(0,len(lines)):
+					if (c > size[0]-2):
+						return numPosts-1
+					csr.addstr(c,0,lines[a])
+					c+=1
+			else:
+				if (c > size[0]-2):
+					return numPosts-1
+				csr.addstr(c,0,posts[i][j])
+				c+=1
 		#mark post as read
 		indexIn = indexInStream(posts[i][0], i, posts)
 		if (flag == 1 and getRead(posts[i][0], user) < indexIn):
@@ -335,48 +347,54 @@ if __name__ == "__main__":
 	name = name[:-1]
 
 	csr = curses.initscr()
-	curses.start_color()
-	size = list(csr.getmaxyx())
-	if (size[0] > 24):
-		size[0] = 24
 
-	#stream = changeStream(csr, name)
-	flag = 1
-	index = 0
-	index, posts, curStream = list(changeStream(csr,name))
-	numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
-	while (1==1):
-		c = csr.getch(0,0)
-		csr.clear()
-		if (c == ord('q')):
-			break
-		elif (c == ord('o')):
-			flag = flag*-1
-			if (flag == 1):
-				posts = sortPosts(posts)
-			else:
-				posts = sortPostsAuthor(posts)
+	try:
+		curses.start_color()
+		size = list(csr.getmaxyx())
+		if (size[0] > 24):
+			size[0] = 24
 
-		elif (c == ord('m')):
-			markAllRead(posts, name)
-		elif (c == ord('c')):
-			index, posts = refreshStream(csr, name, curStream)
-			if (flag == -1):
-				posts = sortPostsAuthor(posts)
-		elif (c == ord('s')):
-			#stream = changeStream(csr, name)
-			#posts = list(loadStream(stream, name))
-			index, posts, curStream = (list(changeStream(csr,name)))
-			if (flag == -1):
-				posts = sortPostsAuthor(posts)
-
-		elif (c == 65): #up
-			if (index > 0):
-				index -= pageUpShift(posts, index, csr)
-		elif (c == 66): #down
-			if (index+numPostsOnScreen < len(posts)):
-				index += numPostsOnScreen
-		#refresh page
+		#stream = changeStream(csr, name)
+		flag = 1
+		index = 0
+		index, posts, curStream = list(changeStream(csr,name))
 		numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
+		while (1==1):
+			c = csr.getch(0,0)
+			csr.clear()
+			if (c == ord('q')):
+				break
+			elif (c == ord('o')):
+				flag = flag*-1
+				if (flag == 1):
+					posts = sortPosts(posts)
+				else:
+					posts = sortPostsAuthor(posts)
+
+			elif (c == ord('m')):
+				markAllRead(posts, name)
+			elif (c == ord('c')):
+				index, posts = refreshStream(csr, name, curStream)
+				if (flag == -1):
+					posts = sortPostsAuthor(posts)
+			elif (c == ord('s')):
+				#stream = changeStream(csr, name)
+				#posts = list(loadStream(stream, name))
+				index, posts, curStream = (list(changeStream(csr,name)))
+				if (flag == -1):
+					posts = sortPostsAuthor(posts)
+
+			elif (c == 65): #up
+				if (index > 0):
+					index -= pageUpShift(posts, index, csr)
+			elif (c == 66): #down
+				if (index+numPostsOnScreen < len(posts)):
+					index += numPostsOnScreen
+			#refresh page
+			numPostsOnScreen = displayScreen(csr, posts, size, index, name, flag)
+	except Exception:
+		curses.endwin()
+		traceback.print_exc()
+		exit(0)
 	curses.endwin()
 

@@ -8,3 +8,7 @@
 use:
 make
 ./a2
+
+TODO
+valgrind
+test cases -ryan
