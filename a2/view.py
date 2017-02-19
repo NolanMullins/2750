@@ -244,6 +244,17 @@ def pageUpShift(posts, index, csr):
 
 	return offset
 
+def markAllRead(posts, user):
+	curses.endwin()
+	stream = {}
+	for a in range(0,len(posts)):
+		stream[posts[a][0]] = stream.get(posts[a][0], 0)+1
+	for key, value in stream.items():
+		setRead(key, user, value)
+		#print(key +" : "+ str(value))
+	#print(stream)
+	exit(0)
+
 if __name__ == "__main__":
 	if (len(sys.argv) <= -1):
 		print("No arguments specified")
@@ -272,7 +283,7 @@ if __name__ == "__main__":
 		elif (c == ord('o')):
 			csr.addstr(1,0,"O cmd")
 		elif (c == ord('m')):
-			csr.addstr(1,0,"M cmd")
+			markAllRead(posts, name)
 		elif (c == ord('c')):
 			csr.addstr(1,0,"C cmd")
 		elif (c == ord('s')):
