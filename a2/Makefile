@@ -9,6 +9,7 @@ AUTHOR = addAuthor.c
 EXEAUTHOR = addauthor
 
 all: echo lib conv author
+	chmod +x view.py
 	@echo "Done Building"
 
 echo:
