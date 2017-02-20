@@ -10,7 +10,9 @@ along with the user's data. The viewer will be able to move through mosts, sort 
 and reload them. 
 
 Known issues
- - posts have to be less than 25 lines long, else you will not be able to move to the next post
+ - If a post is longer than 24 lines and wider than 80 chars, scrolling may be a little wierd
+ - posts longer than 48 chars will be scrollable but when going up, the user will be brought to
+   top of the post
 
 /**********************************/
 	Instructions - compile
