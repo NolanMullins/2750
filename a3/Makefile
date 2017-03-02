@@ -1,5 +1,5 @@
-OBJ = main.o list.o parse.o 
-FLAGS = -Wall -Iinclude -ansi -Iinclude
+OBJ = main.o list.o parse.o gen.o
+FLAGS = -Wall -Iinclude -ansi
 EXE = run
 
 all: $(OBJ)

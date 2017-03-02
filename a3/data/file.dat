@@ -1,2 +1,2 @@
 .h(  text="Description\n", size=5).t( text="Description")
-.b( text="Description")
+.b(name="<name>", link="<page>")

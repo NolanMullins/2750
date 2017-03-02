@@ -4,12 +4,24 @@
 #include "structData.h"
 #include "parse.h"
 #include "list.h"
+#include "gen.h"
 
+void freeString(void* data)
+{
+	free((char*)data);
+}
+
+void desElement(void* data)
+{
+	Element* e = (Element*)data;
+	e->data = listClear(e->data, freeString);
+	free(e);
+}
 
 int main(int argc, char* argv[])
 {
 	List* list = parse("data/file.dat");
-	int a;
+	/*int a;
 	for (a = 0; a < listSize(list); a++)
 	{
 		Element* e = (Element*)listGet(list, a);
@@ -19,6 +31,8 @@ int main(int argc, char* argv[])
 		{
 			printf("%s\n", (char*)listGet(e->data, b));
 		}
-	}
+	}*/
+	gen(list, "out.dat");
+	list = listClear(list, desElement);
 	return 0;
 }
