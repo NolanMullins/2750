@@ -87,7 +87,6 @@ void genH(Element* e)
 			int b;
 			for (b=equal; b < strlen(string); b++)
 				size = size*10 + string[b]-'0';
-
 		}
 		else if (strcmpA3("text", string))
 		{
@@ -108,12 +107,65 @@ void genI(Element* e)
 
 void genL(Element* e)
 {
-
+	/*<a href="url">link text</a>*/
+	List* args = e->data;
+	int a;
+	char url[256];
+	char text[256];
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("link", string))
+			bite(url, string, equal);
+		else if (strcmpA3("text", string))
+		{
+			*text = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(text, &tmp[1], strlen(tmp)-1);
+			text[strlen(text)-1] = '\0';
+		}
+	}
+	printf("<a href=\"%s\">%s</a>\n", url, text);
 }
 
 void genP(Element* e)
 {
-
+	/*<img src="wrongname.gif" alt="HTML5 Icon" style="width:128px;height:128px;">*/
+	List* args = e->data;
+	int a;
+	int width = 100, height = 100;
+	char text[256];
+	*text = 0;
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("size", string))
+		{
+			width = 0;
+			height = 0;
+			int flag = 0;
+			int b;
+			for (b=equal; b < strlen(string); b++)
+			{
+				if (string[b] == 'x')
+				{
+					if (flag)
+						break;
+					flag = 1;
+				}
+				else if (flag)
+					height = height*10+string[b]-'0';
+				else
+					width = width*10+string[b]-'0';
+			}
+		}
+		else if (strcmpA3("image", string))
+			bite(text, string, equal);
+	}
+	printf("<img src=%s alt=\"HTML5 Icon\" style=\"width:%dpx;height:%dpx;\">\n", text, width, height);
 }
 
 void genR(Element* e)

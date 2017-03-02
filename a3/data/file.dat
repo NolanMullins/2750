@@ -1,2 +1,3 @@
-.h(  text="Description\n", size=5).t( text="Description")
+.h(  text="Description\n", size=5).l(text="Click Me", link=reddit.com)
 .b(name="<name>", link="<page>")
+.p(image="pic.png", size=200x300)
