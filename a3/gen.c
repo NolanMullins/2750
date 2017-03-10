@@ -214,9 +214,9 @@ void genR(Element* e)
 	.r(action="radio.php",name="colour",value="red",value="green",value="blue")
 	*/
 	List* args = e->data;
-	char action[32];
-	char name[32];
-	char values[16][32];
+	char action[64];
+	char name[64];
+	char values[16][64];
 	int vlaueIndex = 0;
 	int a;
 	for (a=0; a < listSize(args); a++)
@@ -247,7 +247,44 @@ void genR(Element* e)
 
 void genT(Element* e)
 {
+	List* args = e->data;
+	int a;
+	char file[64];
+	char text[512];
+	strcpy(text, "Default Text");
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("text", string))
+		{
+			*text = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(text, &tmp[1], strlen(tmp)-1);
+			text[strlen(text)-1] = '\0';
+		}
+		else if (strcmpA3("file", string))
+		{
+			*file = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(file, &tmp[1], strlen(tmp)-1);
+			file[strlen(file)-1] = '\0';
+			FILE* f = fopen(file, "r");
+			
+			int index = 0;
+			char tmpC = '0';
+			while ((tmpC = getc(f)) != EOF)
+			{
+				text[index++] = tmpC;	
+			}
+			text[index++] = '\0';
 
+			fclose(f);
+		}
+	}
+	printf("%s\n", text);
 }
 
 void gen(List* data, char* file)
