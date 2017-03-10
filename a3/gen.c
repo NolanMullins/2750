@@ -102,7 +102,41 @@ void genH(Element* e)
 
 void genI(Element* e)
 {
-
+	/*
+	<form action="/action_page.php">
+	  input text <input type="text" name="fname"><br>
+	  <input type="submit" value="Submit">
+	</form>
+	*/
+	char actionPage[256];
+	char text[256];
+	char name[256];
+	char value[256];
+	int a;
+	List* args = e->data;
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("action", string))
+			bite(actionPage, string, equal);
+		else if (strcmpA3("text", string))
+		{
+			*text = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(text, &tmp[1], strlen(tmp)-1);
+			text[strlen(text)-1] = '\0';
+		}
+		else if (strcmpA3("name", string))
+			bite(name, string, equal);
+		else if (strcmpA3("value", string))
+			bite(value, string, equal);
+	}
+	printf("<form action=%s>\n", actionPage);
+	printf("\tinput text <input type=%s name=%s><br>\n", text, name);
+	printf("\t<input type=\"submit\" value=%s>\n", value);
+	printf("</form>\n");
 }
 
 void genL(Element* e)
@@ -138,6 +172,7 @@ void genP(Element* e)
 	int width = 100, height = 100;
 	char text[256];
 	*text = 0;
+
 	for (a=0; a < listSize(args); a++)
 	{
 		char* string = getStr(args, a);
@@ -170,7 +205,44 @@ void genP(Element* e)
 
 void genR(Element* e)
 {
+	/*
+	<form>
+	  <input type="radio" name="gender" value="male" checked> Male<br>
+	  <input type="radio" name="gender" value="female"> Female<br>
+	  <input type="radio" name="gender" value="other"> Other  
+	</form>
+	.r(action="radio.php",name="colour",value="red",value="green",value="blue")
+	*/
+	List* args = e->data;
+	char action[32];
+	char name[32];
+	char values[16][32];
+	int vlaueIndex = 0;
+	int a;
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("action", string))
+			bite(action, string, equal);
+		else if (strcmpA3("name", string))
+			bite(name, string, equal);
+		else if (strcmpA3("value", string))
+		{
+			*values[vlaueIndex] = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(values[vlaueIndex] , &tmp[1], strlen(tmp)-1);
+			values[vlaueIndex][strlen(values[vlaueIndex])-1] = '\0';
+			++vlaueIndex;
+		}
+	}
 
+	printf("<form action=%s>\n", action);
+	printf("    <input type=\"radio\" name=%s value=\"%s\" checked> %s<br>\n", name, values[0], values[0]);
+	for (a = 1; a < vlaueIndex; a++)
+		printf("    <input type=\"radio\" name=%s value=\"%s\"> %s<br>\n", name, values[a], values[a]);
+	printf("</form>\n");
 }
 
 void genT(Element* e)
@@ -180,11 +252,12 @@ void genT(Element* e)
 
 void gen(List* data, char* file)
 {
-	/*FILE* f = fopen(file, "w");*/
+	printf("<html>\n<body>\n");
 	int a;
 	for (a = 0; a < listSize(data); a++)
 	{
 		Element* e = (Element*)listGet(data, a);
+		printf("\n");
 		switch (e->tag)
 		{
 			case 'b':
@@ -216,6 +289,6 @@ void gen(List* data, char* file)
 			break;
 		}
 	}
-
+	printf("\n<body>\n<html>\n");
 	/*fclose(f);*/
 }
