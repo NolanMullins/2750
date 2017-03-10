@@ -123,21 +123,22 @@ void genI(Element* e)
 		if (strcmpA3("action", string))
 			bite(actionPage, string, equal);
 		else if (strcmpA3("text", string))
-		{
+			bite(text, string, equal);
+		/*{
 			*text = 0;
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
 			text[strlen(tmp)-2] = '\0';
-		}
+		}*/
 		else if (strcmpA3("name", string))
 			bite(name, string, equal);
 		else if (strcmpA3("value", string))
 			bite(value, string, equal);
 	}
 	printf("<form action=%s>\n", actionPage);
-	printf("    input text <input type=%s name=%s><br>\n", text, name);
-	printf("    <input type=\"submit\" value=%s>\n", value);
+	printf("    input text <input type=%s name=%s value=%s><br>\n", text, name, value);
+	printf("    <input type=\"submit\" value=\"click\">\n");
 	printf("</form>\n");
 }
 
