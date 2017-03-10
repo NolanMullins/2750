@@ -57,7 +57,9 @@ void genB(Element* e)
 		else if (strcmpA3("link", string))
 			bite(link, string, equal);
 	}
-	printf("<form method=\"post\" action=%s><input type=\"submit\">%s</button></form>\n", link, name);
+	printf("<form action=%s>\n", link);
+	printf("    <input type=\"submit\" value=%s/>\n",name);
+	printf("</form>\n");
 }
 
 void genD(Element* e)
@@ -97,7 +99,7 @@ void genH(Element* e)
 			text[strlen(text)-1] = '\0';
 		}
 	}
-	printf("<header><h%d>%s<h%d>\n", size, text, size);
+	printf("<h%d>%s<h%d>\n", size, text, size);
 }
 
 void genI(Element* e)
@@ -126,7 +128,7 @@ void genI(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
-			text[strlen(text)-1] = '\0';
+			text[strlen(tmp)-2] = '\0';
 		}
 		else if (strcmpA3("name", string))
 			bite(name, string, equal);
@@ -134,8 +136,8 @@ void genI(Element* e)
 			bite(value, string, equal);
 	}
 	printf("<form action=%s>\n", actionPage);
-	printf("\tinput text <input type=%s name=%s><br>\n", text, name);
-	printf("\t<input type=\"submit\" value=%s>\n", value);
+	printf("    input text <input type=%s name=%s><br>\n", text, name);
+	printf("    <input type=\"submit\" value=%s>\n", value);
 	printf("</form>\n");
 }
 
@@ -158,10 +160,10 @@ void genL(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
-			text[strlen(text)-1] = '\0';
+			text[strlen(tmp)-2] = '\0';
 		}
 	}
-	printf("<a href=\"%s\">%s</a>\n", url, text);
+	printf("<a href=%s>%s</a>\n", url, text);
 }
 
 void genP(Element* e)
@@ -183,7 +185,7 @@ void genP(Element* e)
 			height = 0;
 			int flag = 0;
 			int b;
-			for (b=equal; b < strlen(string); b++)
+			for (b=equal+1; b < strlen(string)-1; b++)
 			{
 				if (string[b] == 'x')
 				{
@@ -233,7 +235,7 @@ void genR(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(values[vlaueIndex] , &tmp[1], strlen(tmp)-1);
-			values[vlaueIndex][strlen(values[vlaueIndex])-1] = '\0';
+			values[vlaueIndex][strlen(tmp)-2] = '\0';
 			++vlaueIndex;
 		}
 	}
@@ -251,6 +253,7 @@ void genT(Element* e)
 	int a;
 	char file[64];
 	char text[512];
+	*text = 0;
 	strcpy(text, "Default Text");
 	for (a=0; a < listSize(args); a++)
 	{
@@ -262,7 +265,7 @@ void genT(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
-			text[strlen(text)-1] = '\0';
+			text[strlen(tmp)-2] = '\0';
 		}
 		else if (strcmpA3("file", string))
 		{
@@ -270,9 +273,11 @@ void genT(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(file, &tmp[1], strlen(tmp)-1);
-			file[strlen(file)-1] = '\0';
+			file[strlen(tmp)-2] = '\0';
 			FILE* f = fopen(file, "r");
-			
+			if (f == NULL)
+				continue;
+
 			int index = 0;
 			char tmpC = '0';
 			while ((tmpC = getc(f)) != EOF)
