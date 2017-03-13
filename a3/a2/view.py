@@ -353,9 +353,10 @@ def markAllRead(posts, user):
 
 if __name__ == "__main__":
 	if (len(sys.argv) <= 1):
-		print("No User specified")
 		exit(0)
 
+	if (sys.argv[1] == "stream")
+"""
 	name = ""
 	for x in sys.argv[1:]:
 		name+=x+" "
@@ -418,3 +419,4 @@ if __name__ == "__main__":
 		exit(0)
 	curses.endwin()
 
+"""
