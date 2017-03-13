@@ -20,7 +20,9 @@ void desElement(void* data)
 
 int main(int argc, char* argv[])
 {
-	List* list = parse("data/test.txt");
+	if (argc < 2)
+		exit(0);
+	List* list = parse(argv[1]);
 	/*int a;
 	for (a = 0; a < listSize(list); a++)
 	{
