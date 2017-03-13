@@ -57,7 +57,7 @@ void genB(Element* e)
 		else if (strcmpA3("link", string))
 			bite(link, string, equal);
 	}
-	printf("<form action=%s>\n", link);
+	printf("<form action=%s method=\"post\">\n", link);
 	printf("    <input type=\"submit\" value=%s/>\n",name);
 	printf("</form>\n");
 }
@@ -142,7 +142,7 @@ void genI(Element* e)
 		else if (strcmpA3("value", string))
 			bite(value, string, equal);
 	}
-	printf("<form action=%s>\n", actionPage);
+	printf("<form action=%s method=\"post\">\n", actionPage);
 	printf("    %s <input type=\"text\" name=%s value=%s><br>\n", text, name, value);
 	printf("    <input type=\"submit\" value=\"click\">\n");
 	printf("</form>\n");
@@ -251,6 +251,7 @@ void genR(Element* e)
 	printf("    <input type=\"radio\" name=%s value=\"%s\" checked> %s<br>\n", name, values[0], values[0]);
 	for (a = 1; a < vlaueIndex; a++)
 		printf("    <input type=\"radio\" name=%s value=\"%s\"> %s<br>\n", name, values[a], values[a]);
+	printf("<input type=\"submit\" value=\"Submit\"/>\n");
 	printf("</form>\n");
 }
 

@@ -1,6 +1,6 @@
 <?php
 $user = $_POST["user"];
-exec('./a2/view.py listStream ' . $user . ' 2>&1', $index);
+exec('./a3 display.wpml', $index);
 foreach($index as $i)
 	echo $i;
 ?>

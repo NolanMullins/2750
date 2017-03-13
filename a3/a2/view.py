@@ -112,7 +112,7 @@ def getUserStreams(user):
 	streams = []
 	for f in os.listdir("messages"):
 		if (f.endswith("StreamUsers") and signin(f, user) == 1):
-			streams.add(f[:-11])
+			streams.append(f[:-11])
 	return streams
 
 def changeStream (csr, user):
@@ -358,6 +358,17 @@ def markAllRead(posts, user):
 		#print(key +" : "+ str(value))
 	#print(stream)
 
+def printRadioButtons(streams):
+	print("<html>\n<body>")
+	print("Pick a stream\n<hr>")
+	print("<form action=\"display.php\" method=\"post\">")
+	print("<input type=\"radio\" name=\"choice\" value="+streams[0]+" checked> "+streams[0]+"<br>")
+	for stream in streams[1:]:
+		print("<input type=\"radio\" name=\"choice\" value="+stream+" > "+stream+"<br>")
+	print("<input type=\"submit\" value=\"Submit\"/>\n")
+	print("</form>")
+	print("<body>\n<html>")
+
 if __name__ == "__main__":
 	if (len(sys.argv) <= 1):
 		exit(0)
@@ -365,12 +376,8 @@ if __name__ == "__main__":
 	if (sys.argv[1] == "listStream"):
 		if (len(sys.argv) <= 2):
 			exit(0)
-		streams = getUserStreams(sys.argv[2])
-		print("<form action=display.php>")
-		print("<input type=\"radio\" name=\"choice\" value="+streams[0]+" checked> "+streams[0]+"<br>")
-		for stream in streams[1:]:
-			print("<input type=\"radio\" name=\"choice\" value="+stream+" checked> "+stream+"<br>")
-		print("</form>")
+		printRadioButtons(getUserStreams(sys.argv[2]))
+		
 """
 	name = ""
 	for x in sys.argv[1:]:
