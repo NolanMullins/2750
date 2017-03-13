@@ -10,3 +10,8 @@ clean:
 
 %.o : %.c
 	gcc -c $*.c $(FLAGS) -o $*.o
+
+push:
+	git add -A .
+	git commit -m "-"
+	git push
