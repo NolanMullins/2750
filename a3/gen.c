@@ -123,7 +123,13 @@ void genI(Element* e)
 		if (strcmpA3("action", string))
 			bite(actionPage, string, equal);
 		else if (strcmpA3("text", string))
-			bite(text, string, equal);
+		{
+			*text = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(text, &tmp[1], strlen(tmp)-1);
+			text[strlen(text)-1] = '\0';
+		}
 		/*{
 			*text = 0;
 			char tmp[256];
