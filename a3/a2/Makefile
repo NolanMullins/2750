@@ -11,6 +11,7 @@ EXEAUTHOR = addauthor
 
 all: echo buildLib conv author
 	chmod +x view.py
+	chmod +x view.py
 	@echo "Done Building"
 
 echo:

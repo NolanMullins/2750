@@ -108,6 +108,13 @@ def indexInStream(stream, indexMaster, posts):
 			return streamPos
 	return streamPos
 
+def getUserStreams(user):
+	streams = []
+	for f in os.listdir("messages"):
+		if (f.endswith("StreamUsers") and signin(f, user) == 1):
+			streams.add(f[:-11])
+	return streams
+
 def changeStream (csr, user):
 	csr.clear()
 	c = 1
@@ -355,7 +362,15 @@ if __name__ == "__main__":
 	if (len(sys.argv) <= 1):
 		exit(0)
 
-	if (sys.argv[1] == "stream")
+	if (sys.argv[1] == "listStream"):
+		if (len(sys.argv) <= 2):
+			exit(0)
+		streams = printUserStreams(sys.argv[2])
+		print("<form action=display.php>")
+		print("<input type=\"radio\" name=\"choice\" value="+streams[0]+" checked> "+streams[0]+"<br>")
+		for stream in streams[1:]:
+			print("<input type=\"radio\" name=\"choice\" value="+stream+" checked> "+stream+"<br>")
+		print("</form>")
 """
 	name = ""
 	for x in sys.argv[1:]:
