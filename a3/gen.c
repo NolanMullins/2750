@@ -96,7 +96,7 @@ void genH(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
-			text[strlen(text)-1] = '\0';
+			text[strlen(tmp)-2] = '\0';
 		}
 	}
 	printf("<h%d>%s<h%d>\n", size, text, size);
@@ -128,7 +128,7 @@ void genI(Element* e)
 			char tmp[256];
 			bite(tmp, string, equal);
 			memcpy(text, &tmp[1], strlen(tmp)-1);
-			text[strlen(text)-1] = '\0';
+			text[strlen(tmp)-2] = '\0';
 		}
 		/*{
 			*text = 0;
