@@ -137,7 +137,7 @@ void genI(Element* e)
 			bite(value, string, equal);
 	}
 	printf("<form action=%s>\n", actionPage);
-	printf("    input text <input type=%s name=%s value=%s><br>\n", text, name, value);
+	printf("    %s <input type=\"text\" name=%s value=%s><br>\n", text, name, value);
 	printf("    <input type=\"submit\" value=\"click\">\n");
 	printf("</form>\n");
 }
