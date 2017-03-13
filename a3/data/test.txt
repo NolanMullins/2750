@@ -1,0 +1,26 @@
+.h(text="Add or Remove Author1")
+.h(text="Add or Remove Author2",    size=4)
+.h(text="Add or Remove Author3",size=3)
+.h(size=2,text="Add or Remove Author4")
+.h(size=1,   text="Add or Remove Author5")
+
+.t(text="first test")
+.t(file="testText.txt")
+.t(text="<b>HTML test</b>")
+
+.b(name="button1",link="t.php")
+.b(name="button2",   link="t2.php")
+.b(link="m3.php",name="button3")ma
+
+.l(link="https://www.google.ca",text="google")
+.l(text="google",link="www.google.ca")
+.l(text="google",    link="www.google.ca")
+.l(link="www.google.ca",     text="google")
+
+.p(image="image.jpg",size="50x25")
+.p(size="502x225",image="image2.jpg")
+
+.r(action="test55.py",name="myDom",value="blah",value="wqwecvf");
+.r(name="myDom",action="test55.py",value="blah",value="wqwecvf");
+.i(action="phone.php",text="Phone Number",name="number",value="123-456-7890")
+.i(action="addauthor.php",text="T1",name="T2",value="T3",text="T4",name="T5",value="T6",name="T8",value="T9",text="T7")
