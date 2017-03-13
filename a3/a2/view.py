@@ -365,7 +365,7 @@ if __name__ == "__main__":
 	if (sys.argv[1] == "listStream"):
 		if (len(sys.argv) <= 2):
 			exit(0)
-		streams = printUserStreams(sys.argv[2])
+		streams = getUserStreams(sys.argv[2])
 		print("<form action=display.php>")
 		print("<input type=\"radio\" name=\"choice\" value="+streams[0]+" checked> "+streams[0]+"<br>")
 		for stream in streams[1:]:
