@@ -40,9 +40,18 @@ void bite(char* dest, char* src, int index)
 	dest[b-index] = '\0';
 }
 
+void printHiddenVals(char* user, char* stream, int index, int size, int order)
+{
+	if (strlen(user) > 0)
+		printf("	<input type=\"hidden\" name=\"user\" value=\"%s\">\n", user);
+	if (strlen(stream) > 0)
+		printf("	<input type=\"hidden\" name=\"stream\" value=\"%s\">\n", stream);
+	printf("	<input type=\"hidden\" name=\"index\" value=\"%d\">\n", index);
+	printf("	<input type=\"hidden\" name=\"size\" value=\"%d\">\n", size);
+	printf("	<input type=\"hidden\" name=\"order\" value=\"%d\">\n", order);
+}
 
-
-void genB(Element* e)
+void genB(Element* e, char* user, char* stream, int index, int size, int order)
 {
 	List* args = e->data;
 	int a;
@@ -58,6 +67,7 @@ void genB(Element* e)
 			bite(link, string, equal);
 	}
 	printf("<form action=%s method=\"post\">\n", link);
+	printHiddenVals(user, stream, index, size, order);
 	printf("    <input type=\"submit\" value=%s/>\n",name);
 	printf("</form>\n");
 }
@@ -102,7 +112,7 @@ void genH(Element* e)
 	printf("<h%d>%s<h%d>\n", size, text, size);
 }
 
-void genI(Element* e)
+void genI(Element* e, char* user, char* stream, int index, int size, int order)
 {
 	/*
 	<form action="/action_page.php">
@@ -115,13 +125,18 @@ void genI(Element* e)
 	char name[256];
 	char value[256];
 	int a;
+
 	List* args = e->data;
 	for (a=0; a < listSize(args); a++)
 	{
 		char* string = getStr(args, a);
 		int equal = indexOfChar(string, '=')+1;
 		if (strcmpA3("action", string))
+		{
 			bite(actionPage, string, equal);
+			printf("<form action=%s method=\"post\">\n", actionPage);
+			printHiddenVals(user, stream, index, size, order);
+		}
 		else if (strcmpA3("text", string))
 		{
 			*text = 0;
@@ -140,10 +155,11 @@ void genI(Element* e)
 		else if (strcmpA3("name", string))
 			bite(name, string, equal);
 		else if (strcmpA3("value", string))
+		{
 			bite(value, string, equal);
+			printf("    %s <input type=\"text\" name=%s value=%s><br>\n", text, name, value);
+		}
 	}
-	printf("<form action=%s method=\"post\">\n", actionPage);
-	printf("    %s <input type=\"text\" name=%s value=%s><br>\n", text, name, value);
 	printf("    <input type=\"submit\" value=\"click\">\n");
 	printf("</form>\n");
 }
@@ -212,7 +228,7 @@ void genP(Element* e)
 	printf("<img src=%s alt=\"HTML5 Icon\" style=\"width:%dpx;height:%dpx;\">\n", text, width, height);
 }
 
-void genR(Element* e)
+void genR(Element* e, char* user, char* stream, int index, int size, int order)
 {
 	/*
 	<form>
@@ -248,10 +264,12 @@ void genR(Element* e)
 	}
 
 	printf("<form action=%s>\n", action);
+	printHiddenVals(user, stream, index, size, order);
 	printf("    <input type=\"radio\" name=%s value=\"%s\" checked> %s<br>\n", name, values[0], values[0]);
 	for (a = 1; a < vlaueIndex; a++)
 		printf("    <input type=\"radio\" name=%s value=\"%s\"> %s<br>\n", name, values[a], values[a]);
 	printf("<input type=\"submit\" value=\"Submit\"/>\n");
+	
 	printf("</form>\n");
 }
 
@@ -300,7 +318,7 @@ void genT(Element* e)
 	printf("%s\n", text);
 }
 
-void gen(List* data, char* file)
+void gen(List* data, char* file, char* user, char* stream, int index, int size, int order)
 {
 	printf("<html>\n<body>\n");
 	int a;
@@ -311,7 +329,7 @@ void gen(List* data, char* file)
 		switch (e->tag)
 		{
 			case 'b':
-				genB(e);
+				genB(e, user, stream, index, size, order);
 			break;
 			case 'd':
 				genD(e);
@@ -323,7 +341,7 @@ void gen(List* data, char* file)
 				genH(e);
 			break;
 			case 'i':
-				genI(e);
+				genI(e, user, stream, index, size, order);
 			break;
 			case 'l':
 				genL(e);
@@ -332,7 +350,7 @@ void gen(List* data, char* file)
 				genP(e);
 			break;
 			case 'r':
-				genR(e);
+				genR(e, user, stream, index, size, order);
 			break;
 			case 't':
 				genT(e);

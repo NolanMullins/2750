@@ -6,28 +6,49 @@
 
 /* post program */
 
+
+
 class PostEntry {
 	struct userPost post;
 	char stream[256];
-	char textArr[64][256];
+	char textArr[512];
 	int numLine;
-	void readInput(char* name, char* sData, char* data)
+
+	/*void getTime(char* string)
+	{
+
+	}*/
+
+	void readInput(char* name, char* tmpStream, char* tmpTxt)
 	{
 		post.username = name;
-		strcpy(stream, sData);
-		strcpy(textArr[0], data);
+		/*printf("stream: ");
+		fgets(stream, 255, stdin);
+		int a = 0;
+		while (stream[a++] != '\0')
+			if (stream[a-1] == '\n')
+				stream[a-1] = '\0';
+		a=0;
+		printf("text: ");
+		while (a < 64 && fgets(textArr[a++], 255, stdin) != NULL);
+		numLine = a-1;*/
+		strcpy(stream, tmpStream);
+		strcpy(textArr, tmpTxt);
 		return;
 	}
+
 	void getTimeDate(char* timeString)
 	{
 		time_t timeT;
 		time(&timeT);
 		struct tm* info = localtime(&timeT);
 
-		sprintf(timeString, "%d/%d/%d:%d/%d/%d", info->tm_sec, info->tm_min, info->tm_hour,
-		 info->tm_mday, info->tm_mon+1, info->tm_year+1900);
+		/*sprintf(timeString, "%d/%d/%d:%d/%d/%d", info->tm_sec, info->tm_min, info->tm_hour,
+		 =info->tm_mday, info->tm_mon+1, info->tm_year+1900);*/
+		/*sprintf( timeString , "%d/%d/%d:%d/%d/%d" , info->tm_sec , info->tm_min , info->tm_hour , info->tm_mday , info->tm_mon + 1 , info->tm_year  + 1900);*/
 		/*sprintf(timeString, "%d/%d/%d", info->tm_mday, info->tm_mon+1, info->tm_year+1900);*/
 	}
+
 	void formatEntry()
 	{
 		/* put data into struct */
@@ -37,13 +58,14 @@ class PostEntry {
 		post.streamname = stream;
 		int size = numLine*256;
 		char* text = malloc(sizeof(char)*size);
-		strcpy(text, textArr[0]);
+		strcpy(text, textArr);
 		int a;
-		for (a = 1; a < numLine; a++)
-			strcat(text, textArr[a]);
+		for (a = 1; a < numLine; a+=1)
+			strcat(text, textArr);
 		post.text = text;
 		return;
 	}
+
 	int submitPost()
 	{
 		/* submit the post to the stream lib */
@@ -62,6 +84,12 @@ class PostEntry {
 		return 0;
 	}
 };
+
+void append(char* text, char* add)
+{
+	strcat(text, " ");
+	strcat(text, add);
+}
 
 int main(int argc, char* argv[])
 {
@@ -86,10 +114,7 @@ int main(int argc, char* argv[])
 	*text = 0;
 	strcpy(text, argv[3]);
 	for (a = 4; a < argc; a+=1)
-	{
-		strcat(text, " ");
-		strcat(text, argv[a]);
-	}
+		appendcc(text, argv[a]);
 
 	class PostEntry entry;
 	entry.readInputccc(name, stream, text);

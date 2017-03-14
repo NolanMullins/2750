@@ -2,7 +2,7 @@
 .d()
 .b(name="last post", link="<page>")
 .b(name="next post", link="<page>")
-.b(name="submit post", link="<page>")
+.b(name="submit post", link="submitPost.php")
 .b(name="mark all read", link="<page>")
 .b(name="refresh stream", link="<page>")
 .b(name="change stream", link="chooseStream.php")

@@ -1,0 +1,1 @@
+void getTime(void* info2, char* string);
