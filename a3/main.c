@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 #include "structData.h"
+#include "gen.h"
 #include "parse.h"
 #include "list.h"
-#include "gen.h"
+
 
 void freeString(void* data)
 {
@@ -29,6 +31,7 @@ int main(int argc, char* argv[])
 	int index=0, size=0, order=0;
 	*user = 0;
 	*stream = 0;
+	int flag = 1;
 	if (argc > 6)
 	{
 		if (strcmp(argv[2], "n")!=0)
@@ -41,8 +44,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		printf("<html><body>Not enough args<body><html>\n");
-		exit(0);
+		flag = 0;
 	}
 
 	/*int a;
@@ -56,7 +58,8 @@ int main(int argc, char* argv[])
 			printf("%s\n", (char*)listGet(e->data, b));
 		}
 	}*/
-	gen(list, "out.dat", user, stream, index, size, order);
+	/*void gen(List* data, char* file, char* user, char* stream, int index, int size, int order, int flag)*/
+	gen(list, user, stream, index, size, order, flag);
 	list = listClear(list, desElement);
 	return 0;
 }

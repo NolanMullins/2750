@@ -3,6 +3,6 @@
 
 #include "list.h"
 
-void gen(List* data, char* file, char* user, char* stream, int index, int size, int order);
+void gen(List* data, char* user, char* stream, int index, int size, int order, int flag);
 
 #endif
