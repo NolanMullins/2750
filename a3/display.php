@@ -20,6 +20,12 @@ else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 		echo $tmp.'<br>';
 	//load read index and num posts
 }
+else if (isset($_POST["allRead"]) && $_POST["allRead"] == 1)
+{
+	exec('./a2/view.py markAllRead '.$user.' '.$stream.' '.$size.' 2>&1', $allReadInfo);
+	foreach ($allReadInfo as $allRead)
+		echo $allRead.'<br>';	
+}
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);

@@ -57,6 +57,10 @@ void genB(Element* e, char* user, char* stream, int index, int size, int order, 
 	int a;
 	char name[256];
 	char link[256];
+	char hidden[256];
+	char hVal[256];
+	*hidden = 0;
+	*hVal = 0;
 	for (a=0; a < listSize(args); a++)
 	{
 		char* string = getStr(args, a);
@@ -65,10 +69,16 @@ void genB(Element* e, char* user, char* stream, int index, int size, int order, 
 			bite(name, string, equal);
 		else if (strcmpA3("link", string))
 			bite(link, string, equal);
+		else if (strcmpA3("hidden", string))
+			bite(hidden, string, equal);
+		else if (strcmpA3("hVal", string))
+			bite(hVal, string, equal);
 	}
 	printf("<form action=%s method=\"post\">\n", link);
 	if (flag)
 		printHiddenVals(user, stream, index, size, order);
+	if (strlen(hidden) > 0)
+		printf("	<input type=\"hidden\" name=%s value=%s>\n", hidden, hVal);
 	printf("    <input type=\"submit\" value=%s/>\n",name);
 	printf("</form>\n");
 }

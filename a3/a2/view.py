@@ -389,7 +389,8 @@ if __name__ == "__main__":
 		exit(0)
 	if (sys.argv[1] == "markAllRead"):
 		#tag, user, stream, posts
-		setRead(sys.argv[2], sys.argv[3], sys.argv[4])
+		#need to build loadPots(user, stream, length)
+		setRead(sys.argv[3], sys.argv[2], sys.argv[4])
 		print("All messages in the "+sys.argv[3]+" have been read")
 		exit(0)
 	if (sys.argv[1] == "changeStream"):
@@ -398,7 +399,10 @@ if __name__ == "__main__":
 		print(index)
 		print(len(posts))
 		exit(0)
-
+	if (sys.argv[1] == "nextPost"):
+		exit(0)
+	if (sys.argv[1] == "prevPost"):
+		exit(0)
 
 		
 """

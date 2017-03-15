@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
 	{
 		flag = 0;
 	}
-
 	/*int a;
 	for (a = 0; a < listSize(list); a++)
 	{
