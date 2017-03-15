@@ -374,6 +374,7 @@ def printRadioButtons(streams, user, order):
 		print("<input type=\"radio\" name=\"stream\" value="+stream+" > "+stream+"<br>")
 	print("<input type=\"submit\" value=\"Submit\"/>\n")
 	print("<input type=\"hidden\" name=\"user\" value=\""+user+"\">");
+	print("<input type=\"hidden\" name=\"streamChange\" value=\"1\">");
 	print("</form>")
 	print("<body>\n<html>")
 
@@ -385,6 +386,14 @@ if __name__ == "__main__":
 		if (len(sys.argv) <= 2):
 			exit(0)
 		printRadioButtons(getUserStreams(sys.argv[2]), sys.argv[2], sys.argv[3])
+		exit(0)
+	if (sys.argv[1] == "markAllRead"):
+		#tag, user, stream, posts
+		setRead(sys.argv[2], sys.argv[3], sys.argv[4])
+		print("All messages in the "+sys.argv[3]+" have been read")
+
+
+
 		
 """
 	name = ""

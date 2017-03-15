@@ -12,6 +12,10 @@ if (isset($_POST["textStream"]))
 	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData . ' 2>&1', $info);
 	echo end($info) . '<br>';
 }
+else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
+{
+	echo 'new stream is: '.$stream.' <br>';
+}
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);
