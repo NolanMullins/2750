@@ -38,8 +38,9 @@ class PostEntry {
 		int size = numLine*256;
 		char* text = malloc(sizeof(char)*size);
 		strcpy(text, textArr[0]);
+		printf("%s\n", text);
 		int a;
-		for (a = 1; a < numLine; a++)
+		for (a = 1; a < 1; a++)
 			strcat(text, textArr[a]);
 		post.text = text;
 		return;
@@ -65,19 +66,19 @@ class PostEntry {
 
 int main(int argc, char* argv[])
 {
-	exit(0);
 	if (argc < 2)
 		printf("No username\n");
 	if (argc < 2)
 		exit(0);
 	int a;
 	char name[256];
-	char tmp[256];
+	/*char tmp[256];
 	strcpy(tmp, argv[1]);
 	*name = 0;
 	memcpy(name, &tmp[1], strlen(tmp)-1);
-	name[strlen(tmp)-2] = '\0';
-
+	name[strlen(tmp)-2] = '\0';*/
+	strcpy(name, argv[1]);
+	printf("Name: %s\n", name);
 	char stream[64];
 	*stream = 0;
 	strcpy(stream, argv[2]);
@@ -90,9 +91,8 @@ int main(int argc, char* argv[])
 		strcat(text, " ");
 		strcat(text, argv[a]);
 	}
-
 	class PostEntry entry;
-	entry.readInputccc(name, stream, text);
+	entry.readInputcc(name, stream, text);
 	/*char curTime[256];
 	entry.getTimeDate(curTime);*/
 	entry.formatEntry();

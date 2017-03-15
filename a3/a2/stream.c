@@ -111,7 +111,7 @@ void printStruct(FILE* stream, FILE* data, struct userPost *st, int end)
 {
 	fprintf(stream, "%s\n", st->username);
 	fprintf(stream, "%s\n", st->date);
-	fprintf(stream, "%s", st->text);
+	fprintf(stream, "%s\n", st->text);
 	fprintf(data, "%d\n", end);
 }
 
@@ -146,6 +146,7 @@ int updateStream(struct userPost *st)
 		printStruct(streamF, dataF, st,sizeOfPost(st));
 		fclose(streamF);
 		fclose(dataF);
+		printf("Success\n");
 		return 1;
 	}
 	streamF = fopen(stream, "a+");
@@ -169,6 +170,7 @@ int updateStream(struct userPost *st)
 	
 	fclose(streamF);
 	fclose(dataF);
+	printf("Success\n");
 	return 0;
 }
 
@@ -234,6 +236,7 @@ int addUser(char* username, char* list)
 			append(stream, list[a]);
 		a++;
 	}
+	printf("Success\n");
 	return 0;
 }
 
@@ -292,7 +295,7 @@ int removeUser(char* username, char* list)
 			append(stream, list[a]);
 		a++;
 	}
-	return 0;
+	printf("Success\n");
 	return 0;
 }
 

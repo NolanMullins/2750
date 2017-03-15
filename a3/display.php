@@ -9,7 +9,8 @@ if (isset($_POST["textStream"]))
 {
 	$textData = $_POST["textData"];
 	$textStream = $_POST["textStream"];
-	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData);
+	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData . ' 2>&1', $info);
+	echo end($info) . '<br>';
 }
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
