@@ -110,7 +110,7 @@ void genH(Element* e)
 			text[strlen(tmp)-2] = '\0';
 		}
 	}
-	printf("<h%d>%s<h%d>\n", size, text, size);
+	printf("<h%d>%s</h%d>\n", size, text, size);
 }
 
 void genI(Element* e, char* user, char* stream, int index, int size, int order, int flag)
@@ -313,14 +313,24 @@ void genT(Element* e)
 			char tmpC = '0';
 			while ((tmpC = getc(f)) != EOF)
 			{
-				text[index++] = tmpC;	
+				if (tmpC == '\n')
+				{
+					text[index++] = '<';
+					text[index++] = 'b';
+					text[index++] = 'r';
+					text[index++] = '>';
+				}
+				else
+					text[index++] = tmpC;	
 			}
 			text[index++] = '\0';
 
 			fclose(f);
 		}
 	}
+	/*printf("<h5>");*/
 	printf("%s\n", text);
+	/*printf("<h5>");*/
 }
 
 void gen(List* data, char* user, char* stream, int index, int size, int order, int flag)

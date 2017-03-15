@@ -1,4 +1,4 @@
-.h(text="A3 - Main", size=2)
+.h(text="View", size=2)
 .d()
 .b(name="last post", link="<page>")
 .b(name="next post", link="<page>")
@@ -7,3 +7,5 @@
 .b(name="refresh stream", link="<page>")
 .b(name="change stream", link="chooseStream.php")
 .b(name="add/remove author", link="<page>")
+.d()
+.t(file="messages/post.dat")

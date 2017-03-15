@@ -15,6 +15,10 @@ if (isset($_POST["textStream"]))
 else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 {
 	echo 'new stream is: '.$stream.' <br>';
+	exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);
+	foreach ($streamInfo as $tmp)
+		echo $tmp.'<br>';
+	//load read index and num posts
 }
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
