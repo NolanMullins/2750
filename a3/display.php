@@ -26,6 +26,18 @@ else if (isset($_POST["allRead"]) && $_POST["allRead"] == 1)
 	foreach ($allReadInfo as $allRead)
 		echo $allRead.'<br>';	
 }
+else if (isset($_POST["next"]) && $_POST["next"] == 1)
+{
+	//load next post
+	echo 'Need to load next post <br>';
+	unset($_POST['next']);
+}
+else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
+{
+	//load prev post
+	echo 'Need to load prev post <br>';
+	unset($_POST['prev']);
+}
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);
