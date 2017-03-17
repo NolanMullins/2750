@@ -346,6 +346,8 @@ void genT(Element* e)
 void gen(List* data, char* user, char* stream, int index, int size, int order, int flag)
 {
 	printf("<html>\n<body>\n");
+	/*printf("<br> User: %s stream: %s index: %d size: %d order: %d flag: %d <br>", user, stream, index, size, order, flag);*/
+	
 	int a;
 	for (a = 0; a < listSize(data); a++)
 	{

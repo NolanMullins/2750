@@ -208,6 +208,55 @@ def refreshStream (name, stream):
 		index = indexOfXStream(nameIndex, index, posts)
 	return index, posts
 
+def loadStreamSize(name, stream, size):
+	posts = []
+	index = 0
+	nameIndex = ""
+	dateIndex = ""
+	if (stream == "all"):
+		print("all")
+		for f in os.listdir("messages"):
+			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
+				streamPosts = (list(loadStream(f[:-6], name)))
+				
+				if (len(dateIndex) != 0):
+					tmpIndex = getRead(f[:-6], name)
+
+					#Tmp is older than index
+					if (tmpIndex < len(streamPosts)):
+						if (cmp(dateIndex, streamPosts[tmpIndex][2]) == 0):
+							index = tmpIndex
+							nameIndex = f[:-6]
+							dateIndex = streamPosts[tmpIndex][2]
+				else:
+					index = getRead(f[:-6], name)
+					nameIndex = f[:-6]
+					if (index >= len(streamPosts)):
+						index = -1
+					else: 
+						dateIndex = streamPosts[index][2]
+				posts += streamPosts
+	else:
+		if (not os.path.isfile("messages/"+stream+"Stream")):
+			return 0,[]
+		posts = list(loadStream(stream, name))
+		index = getRead(stream, name)
+		nameIndex = stream
+	posts = sortPosts(posts)
+	#get index of first unread post in stream
+	if (index == -1):
+		index = len(posts)-1
+	else:
+		index = indexOfXStream(nameIndex, index, posts)
+	if (index > int(size)):
+		index = int(size)-1;
+	newPosts = [0] * int(size)
+	for a in range(0,int(size)):
+		newPosts[a] = posts[a]
+	#for tmpPost in posts[0:int(size)]:
+		
+	return index, newPosts
+
 def displayBar(csr, yMax):
 	csr.addstr(yMax-1, 0, "↑   ↓   O-order toggle   M-mark all   S-stream  C-check for new")
 
@@ -363,20 +412,35 @@ def printRadioButtons(streams, user, order):
 	print("Pick a stream\n<hr>")
 	print("<form action=\"display.php\" method=\"post\">")
 
-	print("	<input type=\"hidden\" name=\"user\" value=\""+user+"\">");
-
-	print("	<input type=\"hidden\" name=\"index\" value=\"-1\">");
-	print("	<input type=\"hidden\" name=\"size\" value=\"-1\">");
-	print("	<input type=\"hidden\" name=\"order\" value=\""+order+"\">");
-
 	print("<input type=\"radio\" name=\"stream\" value="+streams[0]+" checked> "+streams[0]+"<br>")
 	for stream in streams[1:]:
 		print("<input type=\"radio\" name=\"stream\" value="+stream+" > "+stream+"<br>")
 	print("<input type=\"submit\" value=\"Submit\"/>\n")
 	print("<input type=\"hidden\" name=\"user\" value=\""+user+"\">");
 	print("<input type=\"hidden\" name=\"streamChange\" value=\"1\">");
+	print("	<input type=\"hidden\" name=\"user\" value=\""+user+"\">");
+	print("	<input type=\"hidden\" name=\"index\" value=\"-1\">");
+	print("	<input type=\"hidden\" name=\"size\" value=\"-1\">");
+	print("	<input type=\"hidden\" name=\"order\" value=\""+order+"\">");
 	print("</form>")
 	print("<body>\n<html>")
+
+def printPost(posts, index):
+	file = open("messages/post.dat", "w")
+
+	#for line in newFile:
+	#	file.write(line+"\n")
+	file.write("Stream: "+posts[index][0])
+	file.write("User: "+posts[index][1])
+
+	print("Index: "+str(index))
+	print("Date: "+posts[index][2])
+	date = getTime(posts[index][2])
+	file.write("Date: "+date)
+	for j in range(3,len(posts[index])):
+		file.write(posts[index][j])
+	return 0
+
 
 if __name__ == "__main__":
 	if (len(sys.argv) <= 1):
@@ -396,12 +460,27 @@ if __name__ == "__main__":
 	if (sys.argv[1] == "changeStream"):
 		#print the index and num posts
 		index, posts = refreshStream(sys.argv[2], sys.argv[3])
+		if (index >= len(posts)):
+			index = len(posts)-1
 		print(index)
 		print(len(posts))
 		exit(0)
 	if (sys.argv[1] == "nextPost"):
+		#name stream size index
+		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		if (len(posts) <= index or index < 0):
+			exit(0)
+		for tmpPost in posts:
+			print(tmpPost)
+		printPost(posts, int(sys.argv[5]))
+		#set read
+		#filename, user
+		if (getRead(posts[int(sys.argv[5])], sys.argv[2]) < int(sys.argv[5])):
+			setRead(posts[int(sys.argv[5])], sys.argv[2], int(sys.argv[5]))
 		exit(0)
 	if (sys.argv[1] == "prevPost"):
+		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		printPost(posts, int(sys.argv[5]))
 		exit(0)
 
 		
