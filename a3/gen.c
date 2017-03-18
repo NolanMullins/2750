@@ -362,7 +362,7 @@ void gen(List* data, char* user, char* stream, int index, int size, int order, i
 				genD(e);
 			break;
 			case 'e':
-				genE(e);
+				/*genE(e);*/
 			break;
 			case 'h':
 				genH(e);
@@ -385,5 +385,14 @@ void gen(List* data, char* user, char* stream, int index, int size, int order, i
 		}
 	}
 	printf("\n<body>\n<html>\n");
+
+	for (a = 0; a < listSize(data); a++)
+	{
+		Element* e = (Element*)listGet(data, a);
+		if (e->ta 'e')
+		{
+			/*execute cmd here*/
+		}
+	}
 	/*fclose(f);*/
 }

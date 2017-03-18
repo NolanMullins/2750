@@ -10,27 +10,17 @@ if (isset($_POST["textStream"]))
 	$textData = $_POST["textData"];
 	$textStream = $_POST["textStream"];
 	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData . ' 2>&1', $info);
-	/*foreach ($info as $i) {
-		echo $i . ' <br>';
-	}*/
 	echo end($info) . '<br>';
 }
 else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 {
 	echo 'new stream is: '.$stream.' <br>';
 	exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);
-	/*foreach ($streamInfo as $sInfo)
-	{
-		echo $sInfo.' <br>';
-	}*/
 	$index = $streamInfo[0];
 	$size = $streamInfo[1];
 	exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 	foreach ($nextInfo as $nInfo)
 		echo $nInfo.'<br>';
-	//foreach ($streamInfo as $tmp)
-	//	echo $tmp.'<br>';
-	//load read index and num posts
 }
 else if (isset($_POST["allRead"]) && $_POST["allRead"] == 1)
 {
@@ -52,8 +42,6 @@ else if (isset($_POST["next"]) && $_POST["next"] == 1)
 		foreach ($nextInfo as $nInfo)
 			echo $nInfo.'<br>';	
 	}
-	
-	unset($_POST['next']);
 }
 else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 {
@@ -69,12 +57,9 @@ else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 		foreach ($prevInfo as $pInfo)
 			echo $pInfo.'<br>';	
 	}
-	
-	unset($_POST['prev']);
 }
 else if (isset($_POST["cOrder"]) && $_POST["cOrder"] == 1)
 {
-	//echo '//TODO <br>';
 	echo 'pre Order: '.$order.' <br>'; 
 	if ($order == 1)
 	{
@@ -95,17 +80,13 @@ else if (isset($_POST["userAdd"]))
 	$flag = '';
 	if ($addRemove == 'r')
 		$flag = '-r';
-	//echo 'Add/Removing '.$authorToAdd.' from '.$authorStreams.'<br>';
-	//echo './a2/addauthor '.$flag.' "'.$authorToAdd.'" "'.$authorStreams;
 	exec('./a2/addauthor '.$flag.' "'.$authorToAdd.'" "'.$authorStreams.'" 2>&1', $addauthor);
 	foreach ($addauthor as $aa) {
 		echo $aa . ' <br>';
 	}
-	//echo end($info) . '<br>';
 }
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
-//echo '<br> ./a3 display.wpml ' . $user . ' ' . $stream . ' - '. $index .' - '. $size .' - '. $order.' <br';
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);
 foreach($index as $i)
 	echo $i;
