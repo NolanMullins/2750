@@ -7,29 +7,35 @@
 
 int main(int argc, char* argv[])
 {
+	char streams[256], name[256];
 	if (argc < 2)
 	{
-		printf("Need to enter a user\n");
+		printf("No name\n");
 		exit(0);
 	}
-	char streams[256], name[256];
-	printf("list streams: ");
-	fgets(streams, 255, stdin);
-	if (streams[strlen(streams)-1] == '\n')
-		streams[strlen(streams)-1] = '\0';
-	if (strlen(streams) == 0)
-		return 0;
 	int flag = strcmp("-r", argv[1]);
 	int a = 0;
 	if (flag==0)
 		a++;
 	*name = 0;
-	while (++a < argc)
+	if (argc < a+1)
+	{
+		printf("No name\n");
+		exit(0);
+	}
+	strcpy(name, argv[++a]);
+	if (argc < a+1)
+	{
+		printf("No streams\n");
+		exit(0);
+	}
+	strcpy(streams, argv[++a]);
+	/*while (++a < argc)
 	{
 		strcat(name, argv[a]);
 		if (a+1 < argc)
 			strcat(name, " ");
-	}
+	}*/
 	/*printf("%s\n", name);*/
 	if (flag==0 && argc > 2)
 		removeUser(name, streams);

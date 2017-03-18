@@ -7,6 +7,6 @@
 .b(name="mark all read", link="display.php", hidden="allRead", hVal="1")
 .b(name="refresh stream", link="display.php", hidden="streamChange", hVal="1")
 .b(name="change stream", link="chooseStream.php")
-.b(name="add/remove author", link="<page>")
+.b(name="add/remove author", link="author.php")
 .d()
 .t(file="messages/post.dat")

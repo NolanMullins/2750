@@ -49,7 +49,6 @@ else if (isset($_POST["next"]) && $_POST["next"] == 1)
 	{
 		$index = $index + 1;
 		exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
-		echo 'done running <br>';
 		foreach ($nextInfo as $nInfo)
 			echo $nInfo.'<br>';	
 	}
@@ -88,9 +87,24 @@ else if (isset($_POST["cOrder"]) && $_POST["cOrder"] == 1)
 		$order = 1;
 	}
 }
+else if (isset($_POST["userAdd"]))
+{
+	$authorToAdd = $_POST["userAdd"];
+	$authorStreams = $_POST["streamAdd"];
+	$addRemove = $_POST["addRemove"];
+	$flag = '';
+	if ($addRemove == 'r')
+		$flag = '-r';
+	//echo 'Add/Removing '.$authorToAdd.' from '.$authorStreams.'<br>';
+	//echo './a2/addauthor '.$flag.' "'.$authorToAdd.'" "'.$authorStreams;
+	exec('./a2/addauthor '.$flag.' "'.$authorToAdd.'" "'.$authorStreams.'" 2>&1', $addauthor);
+	foreach ($addauthor as $aa) {
+		echo $aa . ' <br>';
+	}
+	//echo end($info) . '<br>';
+}
 
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
-echo '<br> post Order: '.$order;
 //echo '<br> ./a3 display.wpml ' . $user . ' ' . $stream . ' - '. $index .' - '. $size .' - '. $order.' <br';
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);
 foreach($index as $i)
