@@ -430,15 +430,15 @@ def printPost(posts, index):
 
 	#for line in newFile:
 	#	file.write(line+"\n")
-	file.write("Stream: "+posts[index][0])
-	file.write("User: "+posts[index][1])
+	file.write("Stream: "+posts[index][0] +"\n")
+	file.write("User: "+posts[index][1] +"\n")
 
-	print("Index: "+str(index))
-	print("Date: "+posts[index][2])
+	#print("Index: "+str(index))
+	#print("Size: "+str(len(posts)))
 	date = getTime(posts[index][2])
-	file.write("Date: "+date)
+	file.write("Date: "+date+"\n")
 	for j in range(3,len(posts[index])):
-		file.write(posts[index][j])
+		file.write(posts[index][j]+"\n")
 	return 0
 
 
@@ -452,10 +452,13 @@ if __name__ == "__main__":
 		printRadioButtons(getUserStreams(sys.argv[2]), sys.argv[2], sys.argv[3])
 		exit(0)
 	if (sys.argv[1] == "markAllRead"):
-		#tag, user, stream, posts
+		#tag, user, stream, size
 		#need to build loadPots(user, stream, length)
-		setRead(sys.argv[3], sys.argv[2], sys.argv[4])
-		print("All messages in the "+sys.argv[3]+" have been read")
+		#markAllRead(posts, name)
+		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		markAllRead(posts, sys.argv[2])
+		#setRead(sys.argv[3], sys.argv[2], sys.argv[4])
+		print("All messages in "+sys.argv[3]+" have been read")
 		exit(0)
 	if (sys.argv[1] == "changeStream"):
 		#print the index and num posts
@@ -466,17 +469,17 @@ if __name__ == "__main__":
 		print(len(posts))
 		exit(0)
 	if (sys.argv[1] == "nextPost"):
-		#name stream size index
+		#name stream size index order
 		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
 		if (len(posts) <= index or index < 0):
 			exit(0)
-		for tmpPost in posts:
-			print(tmpPost)
+		#for tmpPost in posts:
+			#print(tmpPost)
 		printPost(posts, int(sys.argv[5]))
 		#set read
 		#filename, user
-		if (getRead(posts[int(sys.argv[5])], sys.argv[2]) < int(sys.argv[5])):
-			setRead(posts[int(sys.argv[5])], sys.argv[2], int(sys.argv[5]))
+		if (int(sys.argv[6]) != 1 and getRead(posts[int(sys.argv[5])][0], sys.argv[2]) < int(sys.argv[5])):
+			setRead(posts[int(sys.argv[5])][0], sys.argv[2], int(sys.argv[5]))
 		exit(0)
 	if (sys.argv[1] == "prevPost"):
 		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])

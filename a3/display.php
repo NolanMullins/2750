@@ -16,13 +16,13 @@ else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 {
 	echo 'new stream is: '.$stream.' <br>';
 	exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);
-	foreach ($streamInfo as $sInfo)
+	/*foreach ($streamInfo as $sInfo)
 	{
 		echo $sInfo.' <br>';
-	}
+	}*/
 	$index = $streamInfo[0];
 	$size = $streamInfo[1];
-	exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' 2>&1', $nextInfo);
+	exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 	foreach ($nextInfo as $nInfo)
 		echo $nInfo.'<br>';
 	//foreach ($streamInfo as $tmp)
@@ -40,12 +40,12 @@ else if (isset($_POST["next"]) && $_POST["next"] == 1)
 	//load next post
 	if ($index+1 >= $size)
 	{
-		echo 'End has been reached';
+		echo 'End has been reached <br>';
 	}
 	else
 	{
 		$index = $index + 1;
-		exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' 2>&1', $nextInfo);
+		exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 		foreach ($nextInfo as $nInfo)
 			echo $nInfo.'<br>';	
 	}
@@ -57,12 +57,12 @@ else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 	//load prev post
 	if ($index <= 0)
 	{
-		echo 'Already at first post';
+		echo 'Already at first post <br>';
 	}
 	else
 	{
 		$index = $index - 1;
-		exec('./a2/view.py prevPost '.$user.' '.$stream.' '.$size.' '.$index.' 2>&1', $prevInfo);
+		exec('./a2/view.py prevPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $prevInfo);
 		foreach ($prevInfo as $pInfo)
 			echo $pInfo.'<br>';	
 	}
