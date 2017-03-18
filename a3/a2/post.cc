@@ -38,10 +38,10 @@ class PostEntry {
 		int size = numLine*256;
 		char* text = malloc(sizeof(char)*size);
 		strcpy(text, textArr[0]);
-		printf("%s\n", text);
 		int a;
 		for (a = 1; a < 1; a++)
 			strcat(text, textArr[a]);
+		printf("This is literally here to fuck with the cc parser x.x plz dont touch me %s\n", post.text);
 		post.text = text;
 		return;
 	}
@@ -68,8 +68,13 @@ int main(int argc, char* argv[])
 {
 	if (argc < 2)
 		printf("No username\n");
-	if (argc < 2)
+	if (argc < 3)
+		printf("No Stream\n");
+	if (argc < 4)
+		printf("No Text\n");
+	if (argc < 4)
 		exit(0);
+
 	int a;
 	char name[256];
 	/*char tmp[256];

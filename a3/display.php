@@ -10,6 +10,9 @@ if (isset($_POST["textStream"]))
 	$textData = $_POST["textData"];
 	$textStream = $_POST["textStream"];
 	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData . ' 2>&1', $info);
+	/*foreach ($info as $i) {
+		echo $i . ' <br>';
+	}*/
 	echo end($info) . '<br>';
 }
 else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
@@ -69,6 +72,11 @@ else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 	
 	unset($_POST['prev']);
 }
+else if (isset($_POST["order"]) && $_POST["order"] == 1)
+{
+	echo '//TODO <br>';
+}
+
 echo 'Logged in as: ' . $user . ' in stream: ' . $stream;
 //echo '<br> ./a3 display.wpml ' . $user . ' ' . $stream . ' - '. $index .' - '. $size .' - '. $order.' <br';
 exec('./a3 display.wpml ' . $user . ' ' . $stream . ' '. $index .' '. $size .' '. $order .' 2>&1', $index);
