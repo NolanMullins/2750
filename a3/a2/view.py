@@ -471,10 +471,19 @@ if __name__ == "__main__":
 	if (sys.argv[1] == "nextPost"):
 		#name stream size index order
 		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		
+		#order
+		if (int(sys.argv[6]) == 1):
+			posts = sortPostsAuthor(posts)
+
+		"""print("Index: "+sys.argv[5])
+		print("Order: "+sys.argv[6])
+		for tmpPost in posts:
+			print(tmpPost)"""
+
 		if (len(posts) <= index or index < 0):
 			exit(0)
-		#for tmpPost in posts:
-			#print(tmpPost)
+
 		printPost(posts, int(sys.argv[5]))
 		#set read
 		#filename, user
@@ -483,6 +492,15 @@ if __name__ == "__main__":
 		exit(0)
 	if (sys.argv[1] == "prevPost"):
 		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		#order
+		if (int(sys.argv[6]) == 1):
+			posts = sortPostsAuthor(posts)
+
+		"""print("Index: "+sys.argv[5])
+		print("Order: "+sys.argv[6])
+		for tmpPost in posts:
+			print(tmpPost)"""
+
 		printPost(posts, int(sys.argv[5]))
 		exit(0)
 
