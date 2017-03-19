@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "structData.h"
 
 int strcmpA3(char* literal, char* dataLine)
@@ -90,7 +91,57 @@ void genD(Element* e)
 
 void genE(Element* e)
 {
-
+	List* args = e->data;
+	char exe[256];
+	int a;
+	for (a=0; a < listSize(args); a++)
+	{
+		char* string = getStr(args, a);
+		int equal = indexOfChar(string, '=')+1;
+		if (strcmpA3("exe", string))
+		{
+			*exe = 0;
+			char tmp[256];
+			bite(tmp, string, equal);
+			memcpy(exe, &tmp[1], strlen(tmp)-1);
+			exe[strlen(tmp)-2] = '\0';
+		}
+	}
+	char cmd[256];
+	strcpy(cmd, "./");
+	strcat(cmd, exe);
+	/* check current */
+	if (access(exe, F_OK) != -1)
+		system(cmd);
+	else
+	{
+		char tmp[256];
+		strcpy(tmp, "bin/");
+		strcat(tmp, exe);
+		if (access(tmp, F_OK) != -1)
+		{
+			*tmp = 0;
+			strcpy(tmp, "cd bin && ");
+			strcat(tmp, cmd);
+		}
+		else
+		{
+			*tmp = 0;
+			strcpy(tmp, "/bin/");
+			strcat(tmp, exe);
+			if (access(tmp, F_OK) != -1)
+			{
+				*tmp = 0;
+				strcpy(tmp, "cd /bin && ");
+				strcat(tmp, cmd);
+				system(tmp);
+			}
+			else
+			{
+				printf("%s not found <br>\n", exe);
+			}
+		}
+	}
 }
 
 void genH(Element* e)
@@ -362,7 +413,7 @@ void gen(List* data, char* user, char* stream, int index, int size, int order, i
 				genD(e);
 			break;
 			case 'e':
-				/*genE(e);*/
+				genE(e);
 			break;
 			case 'h':
 				genH(e);
@@ -385,14 +436,5 @@ void gen(List* data, char* user, char* stream, int index, int size, int order, i
 		}
 	}
 	printf("\n<body>\n<html>\n");
-
-	for (a = 0; a < listSize(data); a++)
-	{
-		Element* e = (Element*)listGet(data, a);
-		if (e->tag == 'e')
-		{
-			/*execute cmd here*/
-		}
-	}
 	/*fclose(f);*/
 }
