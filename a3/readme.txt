@@ -27,3 +27,12 @@ Known issues
 	
 	go to index.php
 /**********************************/
+
+/**********************************/
+	Additional info
+	
+	adding hidden="name", hVal="0"
+	to buttons and input fields in the 
+	wpml files will add a hidden value 
+	to the component
+/**********************************/
