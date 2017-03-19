@@ -18,6 +18,10 @@ else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 	exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);
 	$index = $streamInfo[0];
 	$size = $streamInfo[1];
+	/*echo 'Index: '.$index.' <br>';
+	echo 'size: '.$size.' <br>';
+	foreach ($streamInfo as $sInfo)
+		echo $sInfo.'<br>';*/
 	exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 	foreach ($nextInfo as $nInfo)
 		echo $nInfo.'<br>';
@@ -60,7 +64,6 @@ else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 }
 else if (isset($_POST["cOrder"]) && $_POST["cOrder"] == 1)
 {
-	echo 'pre Order: '.$order.' <br>'; 
 	if ($order == 1)
 	{
 		echo 'Ordering by time <br>';

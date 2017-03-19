@@ -389,7 +389,7 @@ void gen(List* data, char* user, char* stream, int index, int size, int order, i
 	for (a = 0; a < listSize(data); a++)
 	{
 		Element* e = (Element*)listGet(data, a);
-		if (e->ta 'e')
+		if (e->tag == 'e')
 		{
 			/*execute cmd here*/
 		}

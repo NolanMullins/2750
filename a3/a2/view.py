@@ -130,7 +130,6 @@ def changeStream (csr, user):
 	nameIndex = ""
 	dateIndex = ""
 	if (stream.decode() == "all"):
-		print("all")
 		for f in os.listdir("messages"):
 			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
 				streamPosts = (list(loadStream(f[:-6], name)))
@@ -171,10 +170,10 @@ def refreshStream (name, stream):
 	index = 0
 	nameIndex = ""
 	dateIndex = ""
-	if (stream == "all"):
-		print("all")
+	#print (name + " - "+stream)
+	if (stream == "All"):
 		for f in os.listdir("messages"):
-			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
+			if (f.endswith("Stream") and signin(f+"Users", name) == 1):
 				streamPosts = (list(loadStream(f[:-6], name)))
 				
 				if (len(dateIndex) != 0):
@@ -213,10 +212,9 @@ def loadStreamSize(name, stream, size):
 	index = 0
 	nameIndex = ""
 	dateIndex = ""
-	if (stream == "all"):
-		print("all")
+	if (stream == "All"):
 		for f in os.listdir("messages"):
-			if (f.endswith("Stream") and signin(f+"Users", user) == 1):
+			if (f.endswith("Stream") and signin(f+"Users", name) == 1):
 				streamPosts = (list(loadStream(f[:-6], name)))
 				
 				if (len(dateIndex) != 0):
