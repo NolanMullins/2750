@@ -26,6 +26,9 @@ Known issues
 	Instructions - run
 	
 	go to index.php
+
+	to run the parser 
+	./a3 file.wpml
 /**********************************/
 
 /**********************************/

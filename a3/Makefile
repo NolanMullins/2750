@@ -3,7 +3,7 @@ FLAGS = -Wall -Iinclude -ansi
 EXE = a3
 
 all: buildA2 $(OBJ)
-	gcc $(OBJ) $(FLAGS) -o $(EXE)
+	gcc $(OBJ) $(FLAGS) -o $(EXE) && chmod 777 -R .
 
 buildA2:
 	cd a2 && make && cd ..
