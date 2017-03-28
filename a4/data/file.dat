@@ -1,0 +1,5 @@
+.h(  text="Description\n", size=5).l(text="Click Me", link=reddit.com)
+.b(name="<name>", link="<page>")
+.p(image="pic.png", size=200x300)
+.i(action="phone.php",text="Phone Number",name="number", value="123-456-7890")
+.r(action="radio.php",name="colour",value="red",value="green",value="blue")

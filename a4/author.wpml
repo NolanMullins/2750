@@ -1,0 +1,5 @@
+.h(text="Add / Remove author")
+.d()
+.t(text="'a' to add or 'r' to remove")
+.d()
+.i(action="display.php", text="(a)dd or (r)emove: ", name="addRemove", value="a", text="user: ", name="userAdd", value="", text="streams: ", name="streamAdd", value="")
