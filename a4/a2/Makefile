@@ -3,7 +3,7 @@
 #    2750 A2    #
 #################
 POST = post
-FLAGS = -Wall -ansi -Iinclude -g -L. -lstream
+FLAGS = -Wall -ansi -Iinclude -g -L. -lstream -lmysqlclient -L/usr/lib/x86_64-linux-gnu/
 OBJQ1 = stream.o list.o
 EXE = post
 AUTHOR = addAuthor.c
