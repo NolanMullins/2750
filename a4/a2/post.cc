@@ -41,7 +41,7 @@ class PostEntry {
 		int a;
 		for (a = 1; a < 1; a++)
 			strcat(text, textArr[a]);
-		printf("This is literally here to fuck with the cc parser x.x plz dont touch me %s\n", post.text);
+		printf("plz dont touch me %s\n", post.text);
 		post.text = text;
 		return;
 	}

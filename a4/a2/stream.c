@@ -44,7 +44,8 @@ void createSteamTable(MYSQL* mysql)
 	strcpy(query, "create table streamData (id int not null auto_increment,");
 	strcat(query, "streamID char(64),");
 	strcat(query, "userID char(64),");
-	strcat(query, "date char(64),");
+	/*strcat(query, "date char(64),");*/
+	strcat(query, "ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,");
 	strcat(query, "data varchar(512),");
 	strcat(query, "primary key(id) )");
 	
@@ -91,6 +92,32 @@ int tableExists(MYSQL* mysql, char* table)
 	}
 
 	row = mysql_fetch_row(res);
+	mysql_free_result(res); 
+	return atoi(row[0]);
+}
+
+int checkUserExists(MYSQL* mysql, char* user, char* stream)
+{
+
+	if (tableExists(mysql, "userData")==0)
+		return 0;
+
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	char query[MAX_QUERY];
+	
+	*query = 0;
+	sprintf(query, "SELECT count(*) FROM userData WHERE streamID = '%s' and userID = '%s'", stream, user);
+
+	if(mysql_query(mysql, query))
+	  error("failed to check if user exists ",mysql);
+
+	if (!(res = mysql_store_result(mysql))){
+		error("failed store result",mysql);
+	}
+
+	row = mysql_fetch_row(res);
+	mysql_free_result(res); 
 	return atoi(row[0]);
 }
 
@@ -100,7 +127,7 @@ void connectToDB(MYSQL* mysql)
 	mysql_options(mysql, MYSQL_READ_DEFAULT_GROUP, "mydb");
 	if (!mysql_real_connect(mysql, HOSTNAME, USERNAME, PASSWORD,DATABASE, 0, NULL, 0)) 
 	{
-	   error("Could not connect to host.",mysql);
+	   error("Could not connect to host",mysql);
 	}
 }
 
@@ -122,13 +149,27 @@ int updateStream(struct userPost *st)
 	/*MYSQL_RES *res;
 	MYSQL_ROW row;
 	MYSQL_FIELD *field;*/
+	char query[MAX_QUERY];
 
 	connectToDB(&mysql);
+	if (checkUserExists(&mysql, st->username, st->streamname)==0)
+	{
+		printf("User does not have access\n");
+		return 1;
+	}
+
 	if (tableExists(&mysql, "streamData") == 0)
 	{
 		createSteamTable(&mysql);
 		printf("Table was created\n");
 	}
+
+	/* insert post here */
+	*query = 0;
+	sprintf(query, "insert into streamData values (null,'%s','%s', null, '%s')", st->streamname, st->username, st->text);
+	if(mysql_query(&mysql, query))
+		error("Could not insert post",&mysql);
+	
 
 	mysql_close(&mysql);
 	/* end sql */
@@ -144,6 +185,7 @@ int addUser(char* username, char* list)
 	/*MYSQL_RES *res;
 	MYSQL_ROW row;
 	MYSQL_FIELD *field;*/
+	char query[MAX_QUERY];
 
 	connectToDB(&mysql);
 
@@ -162,10 +204,16 @@ int addUser(char* username, char* list)
 		if (list[a] == ',' || list[a] == '\0')
 		{
 			/* add user to stream here */
-			*query = 0;
-			sprintf(query, "insert into userData values (null,'%s','%s',0)", username, stream);
-			if(mysql_query(&mysql, records[x]))
-				error("Could not insert record",&mysql);
+			if (checkUserExists(&mysql, username, stream))
+				printf("User already has access to %s\n", stream);
+			else
+			{
+				*query = 0;
+				sprintf(query, "insert into userData values (null,'%s','%s',0)", username, stream);
+				if(mysql_query(&mysql, query))
+					error("Could not insert record",&mysql);
+			}
+			
 			
 			if (list[a] == '\0')
 				break;
@@ -187,6 +235,7 @@ int removeUser(char* username, char* list)
 	/*MYSQL_RES *res;
 	MYSQL_ROW row;
 	MYSQL_FIELD *field;*/
+	char query[MAX_QUERY];
 
 	connectToDB(&mysql);
 	/* end sql */
@@ -199,6 +248,10 @@ int removeUser(char* username, char* list)
 		if (list[a] == ',' || list[a] == '\0')
 		{
 			/* remove user from stream here */
+			*query = 0;
+			sprintf(query, "Delete from userData where userID = '%s' and streamID = '%s'", username, stream);
+			if(mysql_query(&mysql, query))
+				error("Could not remove user from stream",&mysql);
 			if (list[a] == '\0')
 				break;
 		}
