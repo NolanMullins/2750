@@ -445,18 +445,20 @@ if __name__ == "__main__":
 		exit(0)
 
 	if (sys.argv[1] == "listStream"):
-		if (len(sys.argv) <= 2):
+		"""if (len(sys.argv) <= 2):
 			exit(0)
-		printRadioButtons(getUserStreams(sys.argv[2]), sys.argv[2], sys.argv[3])
+		printRadioButtons(getUserStreams(sys.argv[2]), sys.argv[2], sys.argv[3])"""
+		os.system("./a2/viewDB listStream "+sys.argv[2]+" "+sys.argv[3])
 		exit(0)
 	if (sys.argv[1] == "markAllRead"):
 		#tag, user, stream, size
-		#need to build loadPots(user, stream, length)
+		#need to build loadPosts(user, stream, length)
 		#markAllRead(posts, name)
-		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		
+		"""index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
 		markAllRead(posts, sys.argv[2])
-		#setRead(sys.argv[3], sys.argv[2], sys.argv[4])
-		print("All messages in "+sys.argv[3]+" have been read")
+		#setRead(sys.argv[3], sys.argv[2], sys.argv[4])"""
+		os.system("./a2/viewDB markAllRead "+ sys.argv[2] +" "+ sys.argv[3])
 		exit(0)
 	if (sys.argv[1] == "changeStream"):
 		#print the index and num posts

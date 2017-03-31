@@ -9,7 +9,7 @@ EXE = post
 AUTHOR = addAuthor.c
 EXEAUTHOR = addauthor
 
-all: echo buildLib conv author
+all: echo buildLib conv author dataBase
 	chmod +x view.py
 	chmod +x view.py
 	@echo "Done Building"
@@ -20,6 +20,9 @@ echo:
 author: $(AUTHOR)
 	@echo "Building author program" ;\
 	gcc $(AUTHOR) $(FLAGS) -o $(EXEAUTHOR)
+
+dataBase: 
+	gcc viewDB.c -o viewDB $(FLAGS)
 
 #Build and compile the c++ file
 conv: $(POST).cc runC2c
@@ -51,7 +54,7 @@ stream.o: stream.c
 #	cp stream/stream.h stream.h -f
 
 clean:
-	rm $(POST).c $(EXE) $(EXEAUTHOR) libstream.a *.o
+	rm $(POST).c $(EXE) $(EXEAUTHOR) libstream.a *.o viewDB
 
 %.o : %.c
 	gcc -c $*.c -o $*.o $(FLAGS)

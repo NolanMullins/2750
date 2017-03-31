@@ -186,6 +186,40 @@ void reset(MYSQL* mysql)
 	printf("Success\n");
 }
 
+void userTable(MYSQL* mysql)
+{
+	if (tableExists(mysql, "userData") == 0)
+		return;
+
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	char query[MAX_QUERY];
+	
+	*query = 0;
+
+	strcpy(query, "SELECT * FROM userData order by userID ");
+
+	if(mysql_query(mysql, query))
+	  error("failed check ",mysql);
+
+	if (!(res = mysql_store_result(mysql)))
+		error("failed store 1",mysql);
+	
+	int numFields = mysql_num_fields(res);
+
+	while ((row = mysql_fetch_row(res)))
+	{
+		int a;
+		for(a = 1; a < numFields; a++) 
+		{ 
+			printf("%s ", row[a] ? row[a] : "NULL"); 
+		} 
+		printf("\n");
+	}
+
+	mysql_free_result(res); 
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -205,6 +239,8 @@ int main(int argc, char* argv[])
 			users(&mysql);
 		else if (strcmp("-streams",argv[a])==0)
 			streams(&mysql);
+		else if (strcmp("-userData",argv[a])==0)
+			userTable(&mysql);
 	}
 	
 	mysql_close(&mysql);
