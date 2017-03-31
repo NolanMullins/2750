@@ -15,20 +15,20 @@ if (isset($_POST["textStream"]))
 else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
 {
 	echo 'new stream is: '.$stream.' <br>';
-	exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);
+	exec('./a2/view.py changeStream "'.$user.'" '.$stream.' 2>&1', $streamInfo);
 	$index = $streamInfo[0];
 	$size = $streamInfo[1];
 	/*echo 'Index: '.$index.' <br>';
 	echo 'size: '.$size.' <br>';
 	foreach ($streamInfo as $sInfo)
 		echo $sInfo.'<br>';*/
-	exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
+	exec('./a2/view.py nextPost "'.$user.'" '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 	foreach ($nextInfo as $nInfo)
 		echo $nInfo.'<br>';
 }
 else if (isset($_POST["allRead"]) && $_POST["allRead"] == 1)
 {
-	exec('./a2/view.py markAllRead '.$user.' '.$stream.' '.$size.' 2>&1', $allReadInfo);
+	exec('./a2/view.py markAllRead "'.$user.'" '.$stream.' '.$size.' 2>&1', $allReadInfo);
 	foreach ($allReadInfo as $allRead)
 		echo $allRead.'<br>';	
 }
@@ -42,7 +42,7 @@ else if (isset($_POST["next"]) && $_POST["next"] == 1)
 	else
 	{
 		$index = $index + 1;
-		exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
+		exec('./a2/view.py nextPost "'.$user.'" '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);
 		foreach ($nextInfo as $nInfo)
 			echo $nInfo.'<br>';	
 	}
@@ -57,7 +57,7 @@ else if (isset($_POST["prev"]) && $_POST["prev"] == 1)
 	else
 	{
 		$index = $index - 1;
-		exec('./a2/view.py prevPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $prevInfo);
+		exec('./a2/view.py prevPost "'.$user.'" '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $prevInfo);
 		foreach ($prevInfo as $pInfo)
 			echo $pInfo.'<br>';	
 	}

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import subprocess
 import curses
 import os
 import datetime
@@ -449,6 +450,10 @@ if __name__ == "__main__":
 			exit(0)
 		printRadioButtons(getUserStreams(sys.argv[2]), sys.argv[2], sys.argv[3])"""
 		os.system("./a2/viewDB listStream "+sys.argv[2]+" "+sys.argv[3])
+		#cout = subprocess.Popen("./a2/viewDB listStream "+sys.argv[2]+" "+sys.argv[3])
+		#print("python")
+		#for line in cout:#cout.stdout:
+		#	print(line)
 		exit(0)
 	if (sys.argv[1] == "markAllRead"):
 		#tag, user, stream, size
@@ -462,24 +467,25 @@ if __name__ == "__main__":
 		exit(0)
 	if (sys.argv[1] == "changeStream"):
 		#print the index and num posts
-		index, posts = refreshStream(sys.argv[2], sys.argv[3])
+		"""index, posts = refreshStream(sys.argv[2], sys.argv[3])
 		if (index >= len(posts)):
 			index = len(posts)-1
 		print(index)
-		print(len(posts))
+		print(len(posts))"""
+		os.system("./a2/viewDB changeStream "+ sys.argv[2] +" "+ sys.argv[3])
 		exit(0)
 	if (sys.argv[1] == "nextPost"):
 		#name stream size index order
-		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		"""index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
 		
 		#order
 		if (int(sys.argv[6]) == 1):
 			posts = sortPostsAuthor(posts)
 
-		"""print("Index: "+sys.argv[5])
+		print("Index: "+sys.argv[5])
 		print("Order: "+sys.argv[6])
 		for tmpPost in posts:
-			print(tmpPost)"""
+			print(tmpPost)
 
 		if (len(posts) <= index or index < 0):
 			exit(0)
@@ -488,20 +494,23 @@ if __name__ == "__main__":
 		#set read
 		#filename, user
 		if (int(sys.argv[6]) != 1 and getRead(posts[int(sys.argv[5])][0], sys.argv[2]) < int(sys.argv[5])):
-			setRead(posts[int(sys.argv[5])][0], sys.argv[2], int(sys.argv[5]))
+			setRead(posts[int(sys.argv[5])][0], sys.argv[2], int(sys.argv[5]))"""
+
+		os.system("./a2/viewDB nextPost "+ sys.argv[2] +" "+ sys.argv[3]+" "+ sys.argv[4]+" "+ sys.argv[5]+" "+ sys.argv[6])
 		exit(0)
 	if (sys.argv[1] == "prevPost"):
-		index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
+		"""index, posts = loadStreamSize(sys.argv[2], sys.argv[3], sys.argv[4])
 		#order
 		if (int(sys.argv[6]) == 1):
 			posts = sortPostsAuthor(posts)
 
-		"""print("Index: "+sys.argv[5])
+		print("Index: "+sys.argv[5])
 		print("Order: "+sys.argv[6])
 		for tmpPost in posts:
-			print(tmpPost)"""
+			print(tmpPost)
 
-		printPost(posts, int(sys.argv[5]))
+		printPost(posts, int(sys.argv[5]))"""
+		os.system("./a2/viewDB prevPost "+ sys.argv[2] +" "+ sys.argv[3]+" "+ sys.argv[4]+" "+ sys.argv[5]+" "+ sys.argv[6])
 		exit(0)
 
 		

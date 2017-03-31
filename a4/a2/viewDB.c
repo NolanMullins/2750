@@ -4,7 +4,7 @@
 
 #include <mysql/mysql.h>
 
-#define MAX_QUERY 512
+#define MAX_QUERY 1024
 #define HOSTNAME  "dursley.socs.uoguelph.ca"
 
 #define USERNAME  "mullinsn"
@@ -95,16 +95,26 @@ void printRadioButtons(MYSQL* mysql, char* user, char* order)
 }
 
 /*mysql_free_result(res);  */
-MYSQL_RES* loadPosts(MYSQL* mysql, char* stream, char* user, char* size)
+MYSQL_RES* loadPosts(MYSQL* mysql, char* stream, char* user, int size, int order)
 {
 	MYSQL_RES *res;
 	char query[MAX_QUERY];
 	
 	*query = 0;
 	if (strcmp(stream, "All")==0)
-		sprintf(query, "SELECT top %s * FROM streamData where streamID in (select streamID from userData where userID = '%s') order by ts", size, user);
+	{
+		if (order)
+			sprintf(query, "SELECT streamID, userId, ts, data FROM streamData where streamID in (select streamID from userData where userID = '%s') order by userID LIMIT %d", user, size);
+		else
+			sprintf(query, "SELECT streamID, userId, ts, data FROM streamData where streamID in (select streamID from userData where userID = '%s') order by ts LIMIT %d", user, size);
+	}
 	else
-		sprintf(query, "SELECT top %s * FROM streamData where streamID = '%s' order by ts", size, stream);
+	{	
+		if (order)
+			sprintf(query, "SELECT streamID, userId, ts, data FROM streamData where streamID = '%s' order by userID LIMIT %d", stream, size);
+		else
+			sprintf(query, "SELECT streamID, userId, ts, data FROM streamData where streamID = '%s' order by ts LIMIT %d", stream, size);
+	}
 
 	if(mysql_query(mysql, query))
 	  error("failed loadPosts ",mysql);
@@ -152,6 +162,110 @@ void markAllRead(MYSQL* mysql, char* user, char* stream)
 	printf("All messages in %s have been read\n", stream);
 }
 
+void changeStream(MYSQL* mysql, char* user, char* stream)
+{
+	MYSQL_ROW row;
+	MYSQL_RES *res;
+	char query[MAX_QUERY];
+	
+	*query = 0;
+	if (strcmp(stream, "All")==0)
+		sprintf(query, "select min(postIndex) from userData where userID = '%s' group by userID)", user);
+	else
+		sprintf(query, "SELECT postIndex FROM userData where streamID = '%s' and userID = %s", stream, user);
+
+	if(mysql_query(mysql, query))
+	  error("failed to get index ",mysql);
+
+	if (!(res = mysql_store_result(mysql)))
+		error("failed store result set",mysql);
+
+	/*index*/
+	row = mysql_fetch_row(res);
+	printf("%s\n", row[0]);
+	mysql_free_result(res);
+
+	*query = 0;
+	if (strcmp(stream, "All")==0)
+		sprintf(query, "SELECT count(*) FROM streamData where streamID in (select streamID from userData where userID = '%s')", user);
+	else
+		sprintf(query, "SELECT count(*) FROM streamData where streamID = '%s'", stream);
+
+	if(mysql_query(mysql, query))
+	  error("failed get size ",mysql);
+
+	if (!(res = mysql_store_result(mysql)))
+		error("failed store result set",mysql);
+
+	/*size*/
+	row = mysql_fetch_row(res);
+	printf("%s\n", row[0]);
+	mysql_free_result(res);
+}
+
+/*
+def printPost(posts, index):
+	file = open("messages/post.dat", "w")
+
+	#for line in newFile:
+	#	file.write(line+"\n")
+	file.write("Stream: "+posts[index][0] +"\n")
+	file.write("User: "+posts[index][1] +"\n")
+
+	#print("Index: "+str(index))
+	#print("Size: "+str(len(posts)))
+	date = getTime(posts[index][2])
+	file.write("Date: "+date+"\n")
+	for j in range(3,len(posts[index])):
+		file.write(posts[index][j]+"\n")
+	return 0
+*/
+
+void writePostToFile(MYSQL_ROW row, int numFields)
+{
+	FILE* f = fopen("messages/post.dat", "w");
+	if (f == NULL)
+		exit(0);
+	
+	fprintf(f, "Strean: %s\n", row[0]);
+	fprintf(f, "User: %s\n", row[1]);
+	fprintf(f, "Data: %s\n", row[2]);
+	int a;
+	for (a = 3; a < numFields; a++)
+		fprintf(f, "%s\n", row[a]);
+
+	fclose(f);
+}
+
+void savePost(MYSQL* mysql, char* user, char* stream, int size, int index, int order)
+{
+	if (tableExists(mysql, "streamData") == 0 || tableExists(mysql, "userData") == 0)
+		exit(0);
+
+
+
+	MYSQL_ROW row;
+	MYSQL_RES *res;
+
+	/*MYSQL_RES* loadPosts(MYSQL* mysql, char* stream, char* user, char* size, int order)*/
+	res = loadPosts(mysql, stream, user, size, order);
+
+	int numFields = mysql_num_fields(res);
+
+	int a = 0;
+	while ((row = mysql_fetch_row(res)))
+	{
+		if (a == index)
+			writePostToFile(row, numFields);
+		a++;
+	}
+
+	/* TODO */
+	/* set read */
+
+}
+
+
 int main(int argc, char* argv[])
 {
 	MYSQL mysql;
@@ -169,15 +283,18 @@ int main(int argc, char* argv[])
 	}
 	else if (strcmp("changeStream",argv[1])==0)
 	{
-
+		/*exec('./a2/view.py changeStream '.$user.' '.$stream.' 2>&1', $streamInfo);*/
+		/*print current index and number of posts*/
+		changeStream(&mysql, argv[2], argv[3]);
 	}
 	else if (strcmp("nextPost",argv[1])==0)
 	{
-
+		/*exec('./a2/view.py nextPost '.$user.' '.$stream.' '.$size.' '.$index.' '.$order.' 2>&1', $nextInfo);*/
+		savePost(&mysql, argv[2], argv[3], atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
 	}
 	else if (strcmp("prevPost",argv[1])==0)
 	{
-
+		savePost(&mysql, argv[2], argv[3], atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
 	}
 	
 	mysql_close(&mysql);
