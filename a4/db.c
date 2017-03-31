@@ -220,6 +220,40 @@ void userTable(MYSQL* mysql)
 	mysql_free_result(res); 
 }
 
+void postTable(MYSQL* mysql)
+{
+	if (tableExists(mysql, "streamData") == 0)
+		return;
+
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	char query[MAX_QUERY];
+	
+	*query = 0;
+
+	strcpy(query, "SELECT * FROM streamData order by id ");
+
+	if(mysql_query(mysql, query))
+	  error("failed check ",mysql);
+
+	if (!(res = mysql_store_result(mysql)))
+		error("failed store 1",mysql);
+	
+	int numFields = mysql_num_fields(res);
+
+	while ((row = mysql_fetch_row(res)))
+	{
+		int a;
+		for(a = 0; a < numFields; a++) 
+		{ 
+			printf("%s ", row[a] ? row[a] : "NULL"); 
+		} 
+		printf("\n");
+	}
+
+	mysql_free_result(res); 
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -241,6 +275,8 @@ int main(int argc, char* argv[])
 			streams(&mysql);
 		else if (strcmp("-userData",argv[a])==0)
 			userTable(&mysql);
+		else if (strcmp("-postData",argv[a])==0)
+			postTable(&mysql);
 	}
 	
 	mysql_close(&mysql);
