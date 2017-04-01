@@ -75,7 +75,6 @@ int main(int argc, char* argv[])
 	if (argc < 4)
 		exit(0);
 
-	int a;
 	char name[256];
 	/*char tmp[256];
 	strcpy(tmp, argv[1]);
@@ -91,11 +90,6 @@ int main(int argc, char* argv[])
 	char text[512];
 	*text = 0;
 	strcpy(text, argv[3]);
-	for (a = 4; a < argc; a+=1)
-	{
-		strcat(text, " ");
-		strcat(text, argv[a]);
-	}
 	class PostEntry entry;
 	entry.readInputcc(name, stream, text);
 	/*char curTime[256];

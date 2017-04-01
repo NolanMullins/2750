@@ -237,12 +237,12 @@ void changeStream(MYSQL* mysql, char* user, char* stream)
 
 	*query = 0;
 	if (strcmp(stream, "All")==0)
-		sprintf(query, "select min(postIndex) from userData where userID = '%s' group by userID)", user);
+		sprintf(query, "select min(postIndex) from userData where userID = '%s' group by userID", user);
 	else
 		sprintf(query, "SELECT postIndex FROM userData where streamID = '%s' and userID = '%s'", stream, user);
 
 	if(mysql_query(mysql, query))
-	  error("failed to get index ",mysql);
+	  error("failed to change stream ",mysql);
 
 	if (!(res = mysql_store_result(mysql)))
 		error("failed store result set",mysql);

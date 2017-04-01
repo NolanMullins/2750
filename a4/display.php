@@ -9,7 +9,7 @@ if (isset($_POST["textStream"]))
 {
 	$textData = $_POST["textData"];
 	$textStream = $_POST["textStream"];
-	exec('./a2/post "'.$user.'" '.$textStream.' '.$textData . ' 2>&1', $info);
+	exec('./a2/post "'.$user.'" '.$textStream.' "'.$textData . '" 2>&1', $info);
 	echo end($info) . '<br>';
 }
 else if (isset($_POST["streamChange"]) && $_POST["streamChange"] == 1)
