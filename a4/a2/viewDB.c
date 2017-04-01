@@ -239,7 +239,7 @@ void changeStream(MYSQL* mysql, char* user, char* stream)
 	if (strcmp(stream, "All")==0)
 		sprintf(query, "select min(postIndex) from userData where userID = '%s' group by userID)", user);
 	else
-		sprintf(query, "SELECT postIndex FROM userData where streamID = '%s' and userID = %s", stream, user);
+		sprintf(query, "SELECT postIndex FROM userData where streamID = '%s' and userID = '%s'", stream, user);
 
 	if(mysql_query(mysql, query))
 	  error("failed to get index ",mysql);
