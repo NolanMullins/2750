@@ -76,7 +76,7 @@ void printRadioButtons(MYSQL* mysql, char* user, char* order)
 	printf("Pick a stream\n<hr>\n");
 	printf("<form action=\"display.php\" method=\"post\">\n");
 
-	printf("<input type=\"radio\" name=\"stream\" value=ALL checked> ALL<br>\n");
+	printf("<input type=\"radio\" name=\"stream\" value=All checked> All<br>\n");
 
 	while ((row = mysql_fetch_row(res)))
 		printf("<input type=\"radio\" name=\"stream\" value=%s > %s<br>\n", row[0], row[0]);
